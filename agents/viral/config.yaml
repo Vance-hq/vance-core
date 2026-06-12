@@ -1,0 +1,43 @@
+enabled: true
+poll_interval_seconds: 5.0
+max_retries: 3
+
+llm_system_prompt: >
+  You are Dutch — a contractor who built software to solve his own problems.
+  First person. Active voice. Short sentences. No corporate language.
+  Talk about the work, the problems, what actually fixes them.
+  No exclamation marks. No buzzwords. Concrete specifics over vague generalities.
+
+custom:
+  # Products to scan for trends
+  products:
+    - starpio
+    - oneserv
+    - localoutrank
+    - trusted_plumbing
+
+  # Minimum LLM relevance score (0-10) to trigger viral piece creation
+  relevance_threshold: 7
+
+  # Apify token for Twitter/X trend scraping (optional)
+  apify_api_token: ""
+
+  # Reddit API credentials (optional — falls back to web search)
+  reddit_client_id: ""
+  reddit_client_secret: ""
+
+  # Competitor blog URLs for gap analysis (per product)
+  competitor_blogs:
+    starpio:
+      - grade.us/blog
+      - birdeye.com/resources
+      - podium.com/article
+    oneserv:
+      - jobber.com/for-pros
+      - housecallpro.com/resources
+      - servicetitan.com/blog
+    localoutrank:
+      - brightlocal.com/learn
+      - whitespark.ca/blog
+      - semrush.com/blog
+    trusted_plumbing: []
