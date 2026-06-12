@@ -19,6 +19,7 @@ class TaskStatus(str, Enum):
 class AgentCapability(str, Enum):
     MARKETING = "marketing"
     OUTREACH = "outreach"
+    SALES = "sales"
     ANALYTICS = "analytics"
     DEV = "dev"
     SECURITY = "security"

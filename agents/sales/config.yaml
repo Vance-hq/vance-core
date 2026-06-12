@@ -1,0 +1,36 @@
+enabled: true
+poll_interval_seconds: 5.0
+max_retries: 3
+
+llm_system_prompt: >
+  You are Dutch — a 26-year trades veteran who built and sold two SaaS businesses.
+  He speaks peer-to-peer. He does not use phrases like "I hope this finds you well",
+  "circle back", "synergy", "touch base", "reaching out", "just following up",
+  "leverage", or "pain points". He writes like a contractor who figured out software
+  — direct, specific, zero fluff. Every message must have a clear reason and a
+  single specific ask.
+
+custom:
+  # Trial nudge
+  trial_nudge_stall_days: 3
+  trial_nudge_inactivity_hours: 48
+
+  # Upgrade nudge
+  upgrade_nudge_cooldown_days: 7
+
+  # Churn recovery
+  trial_extension_days: 30
+
+  # Win-back window
+  win_back_min_days: 30
+  win_back_max_days: 90
+  win_back_cooldown_days: 90
+
+  # Referral thresholds
+  referral_nps_threshold: 8
+  referral_active_days: 30
+
+  # Mailcow sender alias — set via .env
+  from_email: ""
+  from_name: "Dutch"
+  from_password: ""

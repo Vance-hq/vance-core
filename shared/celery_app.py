@@ -129,4 +129,24 @@ app.conf.beat_schedule = {
         "task": "agents.analytics.tasks.weekly_growth_report",
         "schedule": 7 * 86_400.0,
     },
+    "sales-daily-trial-nudge": {
+        "task": "agents.sales.tasks.daily_trial_nudge",
+        "schedule": 86_400.0,
+    },
+    "sales-daily-upgrade-nudge": {
+        "task": "agents.sales.tasks.daily_upgrade_nudge",
+        "schedule": 86_400.0,
+    },
+    "sales-weekly-win-back": {
+        "task": "agents.sales.tasks.weekly_win_back",
+        "schedule": 7 * 86_400.0,
+    },
+    "sales-weekly-referral-trigger": {
+        "task": "agents.sales.tasks.weekly_referral_trigger",
+        "schedule": 7 * 86_400.0,
+    },
+    "sales-weekly-pricing-intel": {
+        "task": "agents.sales.tasks.weekly_pricing_intel",
+        "schedule": 7 * 86_400.0,
+    },
 }

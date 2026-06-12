@@ -67,6 +67,10 @@ class Settings:
     OUTREACH_FROM_EMAIL: str = os.getenv("OUTREACH_FROM_EMAIL", "")
     OUTREACH_FROM_PASSWORD: str = os.getenv("OUTREACH_FROM_PASSWORD", "")
 
+    # Sales agent sender alias
+    SALES_FROM_EMAIL: str = os.getenv("SALES_FROM_EMAIL", "")
+    SALES_FROM_PASSWORD: str = os.getenv("SALES_FROM_PASSWORD", "")
+
     # Image generation backend (comfyui = self-hosted GPU; replicate = pay-per-use interim)
     IMAGE_BACKEND: str = os.getenv("IMAGE_BACKEND", "replicate")
     REPLICATE_API_TOKEN: str = os.getenv("REPLICATE_API_TOKEN", "")
