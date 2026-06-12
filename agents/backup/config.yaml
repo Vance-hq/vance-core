@@ -1,0 +1,34 @@
+enabled: true
+poll_interval_seconds: 5.0
+max_retries: 3
+
+llm_system_prompt: ""  # backup agent does not use LLM
+
+custom:
+  # AES-256 encryption key (base64-encoded 32 bytes) — override via BACKUP_ENCRYPTION_KEY env
+  encryption_key: ""
+
+  # Paths to archive in backup_files
+  backup_paths:
+    - /app/uploads
+    - /app/config
+  log_path: /app/logs
+
+  # pg_dump timeout in seconds
+  dump_timeout_s: 300
+
+  # pg_restore timeout in seconds
+  restore_timeout_s: 300
+
+  # Schema name for restore verification
+  test_schema: backup_test
+
+  # Minimum expected row counts for restore validation
+  # Set to 0 to skip count checks but still test restore mechanics
+  restore_min_counts:
+    tasks: 0
+    analytics_snapshots: 0
+
+  # Mailcow admin API host (host only, no scheme)
+  mailcow_host: ""
+  mailcow_api_key: ""

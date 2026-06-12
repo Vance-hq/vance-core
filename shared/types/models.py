@@ -24,6 +24,7 @@ class AgentCapability(str, Enum):
     ADS = "ads"
     ANALYTICS = "analytics"
     DEV = "dev"
+    BACKUP = "backup"
     DEPLOY = "deploy"
     FINANCE = "finance"
     SECURITY = "security"

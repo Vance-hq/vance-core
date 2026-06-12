@@ -137,6 +137,10 @@ class Settings:
     SECURITY_AGENT_PORT: int = int(os.getenv("SECURITY_AGENT_PORT", "8104"))
     SECURITY_AGENT_SECRET: str = os.getenv("SECURITY_AGENT_SECRET", "")
 
+    # Backup agent
+    BACKUP_ENCRYPTION_KEY: str = os.getenv("BACKUP_ENCRYPTION_KEY", "")
+    MAILCOW_API_KEY: str = os.getenv("MAILCOW_API_KEY", "")
+
     # Mailcow SMTP (pre-installed on VPS)
     MAILCOW_HOST: str = os.getenv("MAILCOW_HOST", "10.10.0.2")
     MAILCOW_DOMAIN: str = os.getenv("MAILCOW_DOMAIN", "")

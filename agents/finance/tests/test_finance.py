@@ -459,7 +459,10 @@ class TestAnomalyDetector:
             "type": "customer.subscription.deleted",
             "data": {"object": {"id": "sub_abc"}},
         }
-        with patch("agents.finance.anomaly_detector.StripeConnector") as MockStripe:
+        with (
+            patch("agents.finance.anomaly_detector.StripeConnector") as MockStripe,
+            patch("agents.finance.anomaly_detector.TaskQueue"),
+        ):
             MockStripe.return_value.get_mrr.return_value = {"mrr_cents": 10000, "subscription_count": 9}
             detector._stripe = MockStripe.return_value
             result = detector.detect(event)
