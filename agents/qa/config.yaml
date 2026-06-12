@@ -1,0 +1,68 @@
+enabled: true
+poll_interval_seconds: 5.0
+max_retries: 1
+
+llm_system_prompt: >
+  You are a senior QA engineer. Write comprehensive, meaningful tests that catch
+  real bugs. Prioritize edge cases and integration boundaries.
+
+custom:
+  repos_path: "/repos"
+  subprocess_timeout_s: 120
+  load_test_timeout_s: 300
+  p99_alert_threshold_ms: 2000
+  coverage_threshold_pct: 60.0
+
+  # GitHub
+  github_token: ""
+  github_org: "vance-hq"
+
+  # Active repos
+  repos:
+    vance-app:
+      type: node
+      default_branch: main
+
+    vance-core:
+      type: python
+      default_branch: main
+
+    trusted-plumbing-site:
+      type: node
+      default_branch: main
+
+  # Per-product Playwright configuration
+  products:
+    starpio:
+      repo: vance-app
+      playwright_tag: "@starpio"
+      critical_flows:
+        - signup
+        - connect_gbp
+        - receive_review
+        - ai_response
+
+    oneserv:
+      repo: vance-app
+      playwright_tag: "@oneserv"
+      critical_flows:
+        - signup
+        - create_job
+        - dispatch
+        - invoice
+
+    localoutrank:
+      repo: vance-app
+      playwright_tag: "@localoutrank"
+      critical_flows:
+        - signup
+        - run_audit
+        - view_report
+        - export
+
+    trusted_plumbing:
+      repo: trusted-plumbing-site
+      playwright_tag: "@trusted_plumbing"
+      critical_flows:
+        - contact_form
+        - confirmation_email
