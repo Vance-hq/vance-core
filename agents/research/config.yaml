@@ -1,0 +1,58 @@
+enabled: true
+poll_interval_seconds: 10.0
+max_retries: 3
+
+llm_system_prompt: >
+  You are a competitive intelligence and market research analyst.
+  Be precise, evidence-based, and actionable. Surface only what matters.
+  Noise is expensive — only flag signals that require a decision or response.
+
+custom:
+  serper_api_key: ""
+  reddit_client_id: ""
+  reddit_client_secret: ""
+
+  products:
+    starpio:
+      name: "Starpio"
+      competitors:
+        - birdeye
+        - podium
+        - grade_us
+      keywords:
+        - "google review management"
+        - "review automation SaaS"
+        - "GBP reply automation"
+      feature_set:
+        - ai_responses
+        - review_monitoring
+        - gbp_integration
+        - sms_alerts
+
+    oneserv:
+      name: "Oneserv"
+      competitors:
+        - jobber
+        - housecall_pro
+      keywords:
+        - "field service management software"
+        - "job dispatch app small business"
+      feature_set:
+        - job_creation
+        - dispatch
+        - invoicing
+        - crew_management
+
+    localoutrank:
+      name: "LocalOutRank"
+      competitors:
+        - brightlocal
+        - whitespark
+      keywords:
+        - "local SEO audit tool"
+        - "Google Business Profile optimization"
+      feature_set:
+        - seo_audit
+        - citation_tracking
+        - gbp_optimizer
+        - rank_tracker
