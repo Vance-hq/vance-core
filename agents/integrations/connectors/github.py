@@ -130,3 +130,21 @@ class GitHubConnector(BaseConnector):
         if data.get("encoding") == "base64":
             data["decoded_content"] = base64.b64decode(data["content"].replace("\n", "")).decode()
         return data
+
+    def list_collaborators(self, repo: str | None = None) -> list[dict]:
+        """List all collaborators across org repos (or a single repo)."""
+        if repo:
+            resp = self.request(
+                "GET",
+                f"{_BASE}/repos/{self._org}/{repo}/collaborators",
+                params={"per_page": 100},
+                headers=self._headers,
+            )
+            return resp.json()
+        resp = self.request(
+            "GET",
+            f"{_BASE}/orgs/{self._org}/members",
+            params={"per_page": 100, "role": "all"},
+            headers=self._headers,
+        )
+        return resp.json()

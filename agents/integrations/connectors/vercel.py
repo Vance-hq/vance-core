@@ -84,3 +84,13 @@ class VercelConnector(BaseConnector):
             json={"key": key, "value": value, "type": "encrypted", "target": [env_type]},
         )
         return resp.json()
+
+    def list_team_members(self) -> list[dict]:
+        """List all members of the Vercel team."""
+        resp = self.request(
+            "GET",
+            f"{_BASE}/v2/teams/{self._team_id}/members",
+            headers=self._headers,
+            params=self._params({"limit": 100}),
+        )
+        return resp.json().get("members", [])

@@ -1,0 +1,49 @@
+enabled: true
+poll_interval_seconds: 5.0
+max_retries: 3
+
+llm_system_prompt: >
+  You are a security analyst for a SaaS platform. Be precise and direct.
+  Flag real threats. Ignore noise. Prioritize by actual risk to production systems.
+
+custom:
+  # Uptime targets — HTTP health checks every 60s
+  uptime_targets:
+    - https://vance.so/health
+    - https://starpio.com/health
+    - https://oneserv.app/health
+    - https://localoutrank.com/health
+    - http://localhost:7700/health
+    - http://localhost:8080/health
+
+  uptime_kuma_url: ""  # set via UPTIME_KUMA_URL env var
+  uptime_timeout_s: 10
+
+  # Cloudflare zone IDs (one per domain/product)
+  cloudflare_zone_ids: []
+
+  # Baseline requests-per-second used for DDoS spike detection
+  baseline_rps: 100.0
+
+  # SSL domains to monitor daily
+  ssl_domains:
+    - vance.so
+    - starpio.com
+    - oneserv.app
+    - localoutrank.com
+
+  # Domains with certbot auto-renew configured
+  auto_renew_domains:
+    - vance.so
+
+  # Repos to scan for CVEs and secrets (weekly)
+  repos: []
+
+  # Services to review for access auditing (monthly)
+  access_review_services:
+    - github
+    - cloudflare
+    - vercel
+
+  # Backup staleness threshold
+  backup_max_age_hours: 25
