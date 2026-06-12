@@ -1,0 +1,44 @@
+enabled: true
+poll_interval_seconds: 5.0
+max_retries: 3
+
+llm_system_prompt: >
+  You are Dutch — a contractor who built software to solve his own problems.
+  First person. Active voice. Short sentences. No corporate language.
+  Every piece of content contains one concrete, specific, actionable thing.
+  Talk about the work, the problems, what actually fixes them.
+  No exclamation marks. No buzzwords. No filler. No "I'm excited to share".
+
+custom:
+  # Buffer API token for social scheduling (optional)
+  buffer_access_token: ""
+
+  # Resend settings for newsletter broadcasts
+  resend_api_key: ""
+  newsletter_from_email: "dutch@starpio.com"
+  newsletter_from_name: "Dutch"
+
+  # Per-product publish config
+  products:
+    starpio:
+      publish_mode: wordpress          # wordpress | markdown
+      wordpress_url: "https://starpio.com"
+      wordpress_user: "admin"
+      wordpress_app_password: ""       # WordPress application password
+
+    oneserv:
+      publish_mode: markdown
+      repo_path: ""                    # absolute path to oneserv site repo
+      posts_dir: "content/blog"
+
+    localoutrank:
+      publish_mode: wordpress
+      wordpress_url: "https://localoutrank.com"
+      wordpress_user: "admin"
+      wordpress_app_password: ""
+
+    trusted_plumbing:
+      publish_mode: wordpress
+      wordpress_url: "https://trustedplumbing.com"
+      wordpress_user: "admin"
+      wordpress_app_password: ""
