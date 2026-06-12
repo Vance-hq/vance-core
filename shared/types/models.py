@@ -25,6 +25,7 @@ class AgentCapability(str, Enum):
     ANALYTICS = "analytics"
     DEV = "dev"
     DEPLOY = "deploy"
+    FINANCE = "finance"
     SECURITY = "security"
     FORGE = "forge"
     LOCAL_RANK_GRADER = "local_rank_grader"

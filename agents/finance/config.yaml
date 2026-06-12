@@ -1,0 +1,34 @@
+enabled: true
+poll_interval_seconds: 5.0
+max_retries: 3
+
+llm_system_prompt: >
+  You are a senior financial analyst for a SaaS company. Provide concise,
+  data-driven insights. When forecasting, give realistic low/base/high
+  scenarios with clear assumptions. Focus on actionable recommendations.
+
+custom:
+  # MRR drop threshold triggering an alert (fraction, e.g. 0.05 = 5%)
+  mrr_drop_alert_threshold: 0.05
+
+  # Charge spike: alert when single charge exceeds this multiple of 30-day average
+  charge_spike_multiplier: 3.0
+
+  # Refund spike: alert when refund count in 24h exceeds this
+  refund_spike_count: 5
+
+  # Failed payment spike: alert when failed count in 24h exceeds this
+  failed_payment_spike_count: 10
+
+  # Products tracked by Stripe product ID (empty = treat all subs as one product)
+  products:
+    default: ""
+
+  # Vendor cost config (amounts filled by environment / secrets)
+  vendors:
+    - name: contabo
+      category: infrastructure
+    - name: anthropic
+      category: ai_api
+    - name: vercel
+      category: hosting
