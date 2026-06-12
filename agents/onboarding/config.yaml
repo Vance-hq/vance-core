@@ -1,0 +1,47 @@
+enabled: true
+poll_interval_seconds: 5.0
+max_retries: 3
+
+llm_system_prompt: >
+  You are a growth analyst who deeply understands user activation.
+  Focus on outcomes, not features. Identify the single biggest
+  lever to move users from signup to first value. Be specific.
+
+custom:
+  # Email
+  resend_api_key: ""
+  dutch_email: "dutch@vance.com"
+  dutch_reply_to: "dutch@vance.com"
+
+  # Supabase — for user lookups in stuck_user_alert
+  supabase_url: ""
+  supabase_service_key: ""
+
+  products:
+    starpio:
+      name: "Starpio"
+      from_email: "dutch@starpio.com"
+      from_name: "Dutch"
+      milestones:
+        - connected_gbp
+        - first_review_seen
+        - first_response_sent
+
+    oneserv:
+      name: "Oneserv"
+      from_email: "dutch@oneserv.com"
+      from_name: "Dutch"
+      milestones:
+        - created_account
+        - first_job
+        - first_dispatch
+        - first_invoice
+
+    localoutrank:
+      name: "LocalOutRank"
+      from_email: "dutch@localoutrank.com"
+      from_name: "Dutch"
+      milestones:
+        - ran_audit
+        - viewed_report
+        - applied_first_recommendation
