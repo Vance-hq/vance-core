@@ -1,0 +1,30 @@
+# Wake word
+openwakeword>=0.6.0
+
+# Audio I/O
+pyaudio>=0.2.14
+sounddevice>=0.4.6
+numpy>=1.24.0
+scipy>=1.11.0
+
+# STT
+faster-whisper>=1.0.0
+
+# TTS
+TTS>=0.22.0          # Coqui TTS (includes XTTS-v2)
+
+# Voice activity detection
+webrtcvad>=2.0.10    # Google's VAD — open-source, included in WebRTC
+
+# Push-to-talk hotkey
+keyboard>=0.13.5
+
+# HTTP client (dispatch to orchestrator)
+httpx>=0.27.0
+
+# Config
+pydantic>=2.0.0
+pyyaml>=6.0
+
+# NOTE: XTTS-v2 model (~2GB) downloads on first run automatically.
+# NOTE: Whisper model downloads on first run based on stt.model_size in config.yaml.

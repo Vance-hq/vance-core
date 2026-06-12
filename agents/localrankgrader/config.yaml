@@ -1,0 +1,40 @@
+enabled: true
+poll_interval_seconds: 2.0
+max_retries: 3
+llm_system_prompt: >
+  You are a Google Business Profile optimization expert and direct-response copywriter
+  for LocalRankGrader. You write specific, data-driven audit insights for local businesses.
+  Every recommendation must be actionable, concrete, and reference the business's actual
+  data. Never use generic advice. Always link improvements to more customers and revenue.
+custom:
+  # Score weights — must sum to 100
+  score_weights:
+    completeness: 25
+    photos: 15
+    reviews: 25
+    posts: 10
+    qa: 5
+    services: 5
+    keywords: 10
+    citations: 5
+  # Competitor benchmarking
+  benchmark_competitor_count: 3
+  benchmark_radius_km: 10
+  # Nurture sequence delays (days after report delivery)
+  nurture_delays_days: [3, 7, 14, 21]
+  # Lead scoring thresholds
+  upgrade_nudge_threshold: 80
+  link_click_score_delta: 20
+  pricing_visit_score_delta: 40
+  # Citation directories to check for NAP consistency
+  citation_directories:
+    - yelp.com
+    - yellowpages.com
+    - bbb.org
+    - mapquest.com
+    - manta.com
+    - angieslist.com
+    - foursquare.com
+    - citysearch.com
+    - merchantcircle.com
+    - superpages.com

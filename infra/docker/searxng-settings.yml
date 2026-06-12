@@ -1,0 +1,47 @@
+# SearXNG settings for Vance — web research for all agents.
+# Mounted read-only into the searxng container.
+# secret_key is overridden by the SEARXNG_SECRET environment variable.
+
+use_default_settings: true
+
+server:
+  bind_address: "0.0.0.0:8080"
+  secret_key: "REPLACED_BY_SEARXNG_SECRET_ENV"
+  limiter: false
+  image_proxy: false
+
+ui:
+  default_theme: simple
+  query_in_title: false
+
+search:
+  safe_search: 0
+  formats:
+    - html
+    - json
+
+engines:
+  - name: google
+    engine: google
+    shortcut: g
+    use_mobile_ui: false
+
+  - name: bing
+    engine: bing
+    shortcut: b
+
+  - name: duckduckgo
+    engine: duckduckgo
+    shortcut: d
+
+  - name: brave
+    engine: brave
+    shortcut: br
+
+  - name: google news
+    engine: google_news
+    shortcut: gn
+
+  - name: hackernews
+    engine: hackernews
+    shortcut: hn

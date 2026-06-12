@@ -1,0 +1,39 @@
+# WireGuard — local machine client config
+# Save to: /etc/wireguard/wg0.conf  (or use the GUI client on Windows/Mac)
+#
+# Setup steps on the local machine:
+#   1. Generate keypair:
+#        wg genkey | tee ~/wg_client_private.key | wg pubkey > ~/wg_client_public.key
+#        chmod 600 ~/wg_client_private.key
+#
+#   2. Replace placeholders below:
+#        CLIENT_PRIVATE_KEY → $(cat ~/wg_client_private.key)
+#        SERVER_PUBLIC_KEY  → the public key from the VPS (see wg0.conf.template setup steps)
+#        SERVER_ENDPOINT    → your Contabo VPS public IP, e.g. 12.34.56.78:51820
+#
+#   3. Share your CLIENT public key with the VPS:
+#        cat ~/wg_client_public.key
+#      Add it to /etc/wireguard/wg0.conf on the VPS under [Peer], then:
+#        wg addconf wg0 <(wg-quick strip wg0)   # hot-reload without restart
+#
+#   4. Start the tunnel:
+#        wg-quick up wg0       # Linux
+#        # On macOS: use WireGuard app and import this file
+#
+# Split tunnel: only 10.99.0.0/24 routes through the VPN.
+# All other traffic (browsing, etc.) uses your normal internet connection.
+
+[Interface]
+Address    = 10.99.0.2/24
+PrivateKey = CLIENT_PRIVATE_KEY
+
+# DNS through the tunnel (optional — remove if not needed)
+# DNS = 10.99.0.1
+
+[Peer]
+PublicKey  = SERVER_PUBLIC_KEY
+Endpoint   = SERVER_ENDPOINT
+# Route only the Vance subnet — split tunnel, not full VPN
+AllowedIPs = 10.99.0.0/24
+# Keep the tunnel alive through NAT
+PersistentKeepalive = 25

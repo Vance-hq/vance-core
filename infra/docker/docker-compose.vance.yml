@@ -1,0 +1,517 @@
+version: "3.9"
+
+# Vance agent stack — runs alongside Mailcow on the same VPS.
+# Mailcow manages its own networks; do not bridge or modify them.
+# All Vance services communicate on vance_net (internal only).
+
+networks:
+  vance_net:
+    driver: bridge
+    internal: false   # orchestrator needs outbound for LLM API calls
+
+volumes:
+  postgres_data:
+  redis_data:
+  vance_logs:
+  playwright_browsers:
+  repos:            # dev agent — Claude Code working directory
+
+x-logging: &default-logging
+  driver: "json-file"
+  options:
+    max-size: "10m"
+    max-file: "5"
+
+x-python-base: &python-base
+  env_file: ../../.env
+  networks:
+    - vance_net
+  volumes:
+    - vance_logs:/app/logs
+  restart: unless-stopped
+  logging: *default-logging
+
+x-agent-base: &agent-base
+  <<: *python-base
+  depends_on:
+    postgres:
+      condition: service_healthy
+    redis:
+      condition: service_healthy
+
+services:
+
+  # ---------------------------------------------------------------------------
+  # Infrastructure
+  # ---------------------------------------------------------------------------
+
+  postgres:
+    <<: *python-base
+    image: pgvector/pgvector:pg16
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - vance_logs:/app/logs
+      - ../db/migrations:/docker-entrypoint-initdb.d:ro
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB:-vance}
+      POSTGRES_USER: ${POSTGRES_USER:-vance}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+    mem_limit: 2g
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-vance}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  redis:
+    <<: *python-base
+    image: redis:7-alpine
+    command: redis-server --appendonly yes --requirepass ${REDIS_PASSWORD}
+    volumes:
+      - redis_data:/data
+      - vance_logs:/app/logs
+    mem_limit: 512m
+    healthcheck:
+      test: ["CMD", "redis-cli", "-a", "${REDIS_PASSWORD}", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # ---------------------------------------------------------------------------
+  # Celery — background tasks and cron beat scheduler
+  # ---------------------------------------------------------------------------
+
+  celery_worker:
+    <<: *python-base
+    build:
+      context: ../..
+      dockerfile: infra/docker/Dockerfile.celery
+    command: >
+      celery -A shared.celery_app worker --loglevel=info --concurrency=4
+      -Q marketing,outreach,sales,reviews,ads,content,video,viral,seo,support,
+         dev,qa,onboarding,research,launch,security,deploy,finance,backup,
+         scaling,analytics,intel,memory,reporting,strategy,forge,
+         localrankgrader,integrations
+    depends_on:
+      redis:
+        condition: service_healthy
+      postgres:
+        condition: service_healthy
+    mem_limit: 1g
+    environment:
+      CELERY_WORKER: "1"
+
+  celery_beat:
+    <<: *python-base
+    build:
+      context: ../..
+      dockerfile: infra/docker/Dockerfile.celery
+    command: celery -A shared.celery_app beat --loglevel=info --scheduler celery.beat.PersistentScheduler
+    depends_on:
+      redis:
+        condition: service_healthy
+    mem_limit: 256m
+    environment:
+      CELERY_BEAT: "1"
+
+  # ---------------------------------------------------------------------------
+  # SearXNG — self-hosted meta-search (replaces SerpAPI)
+  # Used by: forge, intel, research, outreach, viral, seo agents
+  # ---------------------------------------------------------------------------
+
+  searxng:
+    image: searxng/searxng:latest
+    networks:
+      - vance_net
+    volumes:
+      - ./searxng-settings.yml:/etc/searxng/settings.yml:ro
+    environment:
+      SEARXNG_SECRET: ${SEARXNG_SECRET_KEY}
+    expose:
+      - "8888"
+    mem_limit: 256m
+    restart: unless-stopped
+    logging: *default-logging
+
+  # ---------------------------------------------------------------------------
+  # Playwright — shared browser binary
+  # Agents that need it: forge, intel, outreach, viral, reviews, ads
+  # Mount playwright_browsers volume; set PLAYWRIGHT_BROWSERS_PATH=/ms-playwright
+  # ---------------------------------------------------------------------------
+
+  playwright:
+    image: mcr.microsoft.com/playwright/python:v1.44.0-jammy
+    networks:
+      - vance_net
+    volumes:
+      - playwright_browsers:/ms-playwright
+    command: bash -c "playwright install chromium && echo 'Browsers installed' && sleep infinity"
+    mem_limit: 512m
+    restart: unless-stopped
+    logging: *default-logging
+
+  # ---------------------------------------------------------------------------
+  # Core services
+  # ---------------------------------------------------------------------------
+
+  orchestrator:
+    <<: *python-base
+    build:
+      context: ../..
+      dockerfile: core/orchestrator/Dockerfile
+    depends_on:
+      redis:
+        condition: service_healthy
+    expose:
+      - "7700"
+    mem_limit: 512m
+    environment:
+      ORCHESTRATOR_HOST: "0.0.0.0"
+      ORCHESTRATOR_PORT: "7700"
+    healthcheck:
+      test: ["CMD-SHELL", "curl -sf http://localhost:7700/health || exit 1"]
+      interval: 15s
+      timeout: 5s
+      retries: 3
+
+  webhooks:
+    <<: *python-base
+    build:
+      context: ../..
+      dockerfile: webhooks/Dockerfile
+    depends_on:
+      redis:
+        condition: service_healthy
+    expose:
+      - "8080"
+    mem_limit: 256m
+    healthcheck:
+      test: ["CMD-SHELL", "curl -sf http://localhost:8080/health || exit 1"]
+      interval: 15s
+      timeout: 5s
+      retries: 3
+
+  # ---------------------------------------------------------------------------
+  # Agents — growth & acquisition
+  # ---------------------------------------------------------------------------
+
+  marketing:
+    <<: *agent-base
+    build:
+      context: ../..
+      dockerfile: agents/marketing/Dockerfile
+    mem_limit: 256m
+    environment:
+      AGENT_NAME: marketing
+
+  outreach:
+    <<: *agent-base
+    build:
+      context: ../..
+      dockerfile: agents/outreach/Dockerfile
+    volumes:
+      - vance_logs:/app/logs
+      - playwright_browsers:/ms-playwright
+    mem_limit: 256m
+    environment:
+      AGENT_NAME: outreach
+      PLAYWRIGHT_BROWSERS_PATH: /ms-playwright
+
+  sales:
+    <<: *agent-base
+    build:
+      context: ../..
+      dockerfile: agents/sales/Dockerfile
+    mem_limit: 256m
+    environment:
+      AGENT_NAME: sales
+
+  reviews:
+    <<: *agent-base
+    build:
+      context: ../..
+      dockerfile: agents/reviews/Dockerfile
+    volumes:
+      - vance_logs:/app/logs
+      - playwright_browsers:/ms-playwright
+    mem_limit: 256m
+    environment:
+      AGENT_NAME: reviews
+      PLAYWRIGHT_BROWSERS_PATH: /ms-playwright
+
+  ads:
+    <<: *agent-base
+    build:
+      context: ../..
+      dockerfile: agents/ads/Dockerfile
+    volumes:
+      - vance_logs:/app/logs
+      - playwright_browsers:/ms-playwright
+    mem_limit: 256m
+    environment:
+      AGENT_NAME: ads
+      PLAYWRIGHT_BROWSERS_PATH: /ms-playwright
+
+  content:
+    <<: *agent-base
+    build:
+      context: ../..
+      dockerfile: agents/content/Dockerfile
+    mem_limit: 256m
+    environment:
+      AGENT_NAME: content
+
+  video:
+    <<: *agent-base
+    build:
+      context: ../..
+      dockerfile: agents/video/Dockerfile
+    mem_limit: 256m
+    environment:
+      AGENT_NAME: video
+
+  viral:
+    <<: *agent-base
+    build:
+      context: ../..
+      dockerfile: agents/viral/Dockerfile
+    volumes:
+      - vance_logs:/app/logs
+      - playwright_browsers:/ms-playwright
+    mem_limit: 256m
+    environment:
+      AGENT_NAME: viral
+      PLAYWRIGHT_BROWSERS_PATH: /ms-playwright
+
+  seo:
+    <<: *agent-base
+    build:
+      context: ../..
+      dockerfile: agents/seo/Dockerfile
+    mem_limit: 256m
+    environment:
+      AGENT_NAME: seo
+
+  support:
+    <<: *agent-base
+    build:
+      context: ../..
+      dockerfile: agents/support/Dockerfile
+    mem_limit: 256m
+    environment:
+      AGENT_NAME: support
+
+  # ---------------------------------------------------------------------------
+  # Agents — engineering & ops
+  # ---------------------------------------------------------------------------
+
+  dev:
+    <<: *agent-base
+    build:
+      context: ../..
+      dockerfile: agents/dev/Dockerfile
+    volumes:
+      - vance_logs:/app/logs
+      - repos:/repos          # Claude Code working directory for subprocess calls
+    mem_limit: 256m
+    environment:
+      AGENT_NAME: dev
+      REPOS_PATH: /repos
+
+  qa:
+    <<: *agent-base
+    build:
+      context: ../..
+      dockerfile: agents/qa/Dockerfile
+    mem_limit: 256m
+    environment:
+      AGENT_NAME: qa
+
+  deploy:
+    <<: *agent-base
+    build:
+      context: ../..
+      dockerfile: agents/deploy/Dockerfile
+    mem_limit: 256m
+    environment:
+      AGENT_NAME: deploy
+
+  security:
+    <<: *agent-base
+    build:
+      context: ../..
+      dockerfile: agents/security/Dockerfile
+    mem_limit: 256m
+    environment:
+      AGENT_NAME: security
+
+  backup:
+    <<: *agent-base
+    build:
+      context: ../..
+      dockerfile: agents/backup/Dockerfile
+    mem_limit: 256m
+    environment:
+      AGENT_NAME: backup
+
+  scaling:
+    <<: *agent-base
+    build:
+      context: ../..
+      dockerfile: agents/scaling/Dockerfile
+    mem_limit: 256m
+    environment:
+      AGENT_NAME: scaling
+
+  # ---------------------------------------------------------------------------
+  # Agents — product & lifecycle
+  # ---------------------------------------------------------------------------
+
+  onboarding:
+    <<: *agent-base
+    build:
+      context: ../..
+      dockerfile: agents/onboarding/Dockerfile
+    mem_limit: 256m
+    environment:
+      AGENT_NAME: onboarding
+
+  launch:
+    <<: *agent-base
+    build:
+      context: ../..
+      dockerfile: agents/launch/Dockerfile
+    mem_limit: 256m
+    environment:
+      AGENT_NAME: launch
+
+  # ---------------------------------------------------------------------------
+  # Agents — intelligence & research
+  # ---------------------------------------------------------------------------
+
+  research:
+    <<: *agent-base
+    build:
+      context: ../..
+      dockerfile: agents/research/Dockerfile
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+      searxng:
+        condition: service_started
+    mem_limit: 256m
+    environment:
+      AGENT_NAME: research
+
+  intel:
+    <<: *agent-base
+    build:
+      context: ../..
+      dockerfile: agents/intel/Dockerfile
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+      searxng:
+        condition: service_started
+    volumes:
+      - vance_logs:/app/logs
+      - playwright_browsers:/ms-playwright
+    mem_limit: 256m
+    environment:
+      AGENT_NAME: intel
+      PLAYWRIGHT_BROWSERS_PATH: /ms-playwright
+
+  strategy:
+    <<: *agent-base
+    build:
+      context: ../..
+      dockerfile: agents/strategy/Dockerfile
+    mem_limit: 256m
+    environment:
+      AGENT_NAME: strategy
+
+  # ---------------------------------------------------------------------------
+  # Agents — finance & reporting
+  # ---------------------------------------------------------------------------
+
+  finance:
+    <<: *agent-base
+    build:
+      context: ../..
+      dockerfile: agents/finance/Dockerfile
+    mem_limit: 256m
+    environment:
+      AGENT_NAME: finance
+
+  analytics:
+    <<: *agent-base
+    build:
+      context: ../..
+      dockerfile: agents/analytics/Dockerfile
+    mem_limit: 256m
+    environment:
+      AGENT_NAME: analytics
+
+  reporting:
+    <<: *agent-base
+    build:
+      context: ../..
+      dockerfile: agents/reporting/Dockerfile
+    mem_limit: 256m
+    environment:
+      AGENT_NAME: reporting
+
+  memory:
+    <<: *agent-base
+    build:
+      context: ../..
+      dockerfile: agents/memory/Dockerfile
+    mem_limit: 256m
+    environment:
+      AGENT_NAME: memory
+
+  # ---------------------------------------------------------------------------
+  # Agents — product-specific
+  # ---------------------------------------------------------------------------
+
+  forge:
+    <<: *agent-base
+    build:
+      context: ../..
+      dockerfile: agents/forge/Dockerfile
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+      searxng:
+        condition: service_started
+    volumes:
+      - vance_logs:/app/logs
+      - playwright_browsers:/ms-playwright
+    mem_limit: 256m
+    environment:
+      AGENT_NAME: forge
+      PLAYWRIGHT_BROWSERS_PATH: /ms-playwright
+
+  localrankgrader:
+    <<: *agent-base
+    build:
+      context: ../..
+      dockerfile: agents/localrankgrader/Dockerfile
+    mem_limit: 256m
+    environment:
+      AGENT_NAME: localrankgrader
+
+  integrations:
+    <<: *agent-base
+    build:
+      context: ../..
+      dockerfile: agents/integrations/Dockerfile
+    mem_limit: 256m
+    environment:
+      AGENT_NAME: integrations

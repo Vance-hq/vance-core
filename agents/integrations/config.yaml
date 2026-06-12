@@ -1,0 +1,7 @@
+enabled: true
+poll_interval_seconds: 2.0
+max_retries: 3
+llm_system_prompt: ""
+custom:
+  # Audit log retention in days (0 = keep forever)
+  audit_log_retention_days: 90

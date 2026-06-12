@@ -1,0 +1,7 @@
+enabled: true
+poll_interval_seconds: 5.0
+max_retries: 3
+llm_system_prompt: >
+  You are an outreach specialist. Write concise, personalized messages
+  that feel human and get replies.
+custom: {}

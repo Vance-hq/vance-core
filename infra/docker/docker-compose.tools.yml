@@ -1,0 +1,287 @@
+version: "3.9"
+
+# Vance ops tools — monitoring, analytics, wiki, CRM, feature flags.
+# Isolated from the agent stack. Start independently with: make tools
+#
+# Port map:
+#   Twenty CRM:   :3001    Umami:      :3002
+#   Uptime Kuma:  :3003    Grafana:    :3004
+#   Outline:      :3005    Unleash:    :3006
+#   Prometheus:   :9090
+#
+# Note: On a 16GB machine, start tools stack only when not running the full
+# agent stack simultaneously.
+
+networks:
+  tools_net:
+    driver: bridge
+
+volumes:
+  tools_postgres_data:
+  tools_redis_data:
+  grafana_data:
+  prometheus_data:
+  loki_data:
+  uptime_kuma_data:
+  outline_storage:
+  twenty_data:
+
+x-logging: &default-logging
+  driver: "json-file"
+  options:
+    max-size: "10m"
+    max-file: "5"
+
+services:
+
+  # ---------------------------------------------------------------------------
+  # Shared infrastructure
+  # ---------------------------------------------------------------------------
+
+  tools_postgres:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_USER: tools
+      POSTGRES_PASSWORD: ${TOOLS_POSTGRES_PASSWORD}
+      POSTGRES_MULTIPLE_DATABASES: "tools,umami,unleash,outline,twenty"
+    volumes:
+      - tools_postgres_data:/var/lib/postgresql/data
+      - ./tools-db-init.sh:/docker-entrypoint-initdb.d/init.sh:ro
+    networks:
+      - tools_net
+    mem_limit: 1g
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U tools"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    restart: unless-stopped
+    logging: *default-logging
+
+  tools_redis:
+    image: redis:7-alpine
+    command: redis-server --requirepass ${TOOLS_REDIS_PASSWORD}
+    volumes:
+      - tools_redis_data:/data
+    networks:
+      - tools_net
+    mem_limit: 256m
+    healthcheck:
+      test: ["CMD", "redis-cli", "-a", "${TOOLS_REDIS_PASSWORD}", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    restart: unless-stopped
+    logging: *default-logging
+
+  # ---------------------------------------------------------------------------
+  # Twenty CRM — self-hosted CRM (replaces HubSpot / GHL for internal use)
+  # Single source of truth for outreach, sales, and marketing agents
+  # ---------------------------------------------------------------------------
+
+  twenty:
+    image: twentycrm/twenty:latest
+    environment:
+      PG_DATABASE_URL: postgresql://tools:${TOOLS_POSTGRES_PASSWORD}@tools_postgres:5432/twenty
+      SERVER_URL: ${TWENTY_SERVER_URL:-http://localhost:3001}
+      FRONT_BASE_URL: ${TWENTY_FRONT_URL:-http://localhost:3001}
+      STORAGE_TYPE: local
+      APP_SECRET: ${TWENTY_APP_SECRET}
+      REDIS_URL: redis://:${TOOLS_REDIS_PASSWORD}@tools_redis:6379/1
+    volumes:
+      - twenty_data:/app/packages/twenty-server/.local-storage
+    ports:
+      - "3001:3000"
+    depends_on:
+      tools_postgres:
+        condition: service_healthy
+      tools_redis:
+        condition: service_healthy
+    networks:
+      - tools_net
+    mem_limit: 512m
+    restart: unless-stopped
+    logging: *default-logging
+
+  # ---------------------------------------------------------------------------
+  # Umami — privacy-first web analytics (replaces GA on owned properties)
+  # ---------------------------------------------------------------------------
+
+  umami:
+    image: ghcr.io/umami-software/umami:postgresql-latest
+    environment:
+      DATABASE_URL: postgresql://tools:${TOOLS_POSTGRES_PASSWORD}@tools_postgres:5432/umami
+      DATABASE_TYPE: postgresql
+      HASH_SALT: ${UMAMI_HASH_SALT}
+    ports:
+      - "3002:3000"
+    depends_on:
+      tools_postgres:
+        condition: service_healthy
+    networks:
+      - tools_net
+    mem_limit: 256m
+    restart: unless-stopped
+    logging: *default-logging
+
+  # ---------------------------------------------------------------------------
+  # Uptime Kuma — uptime monitor for all product URLs + infra endpoints
+  # ---------------------------------------------------------------------------
+
+  uptime_kuma:
+    image: louislam/uptime-kuma:latest
+    volumes:
+      - uptime_kuma_data:/app/data
+    ports:
+      - "3003:3001"
+    networks:
+      - tools_net
+    mem_limit: 256m
+    restart: unless-stopped
+    logging: *default-logging
+
+  # ---------------------------------------------------------------------------
+  # Monitoring — Prometheus + Loki + Grafana + Promtail + cAdvisor
+  # ---------------------------------------------------------------------------
+
+  prometheus:
+    image: prom/prometheus:latest
+    volumes:
+      - prometheus_data:/prometheus
+      - ./prometheus.yml:/etc/prometheus/prometheus.yml:ro
+    command:
+      - "--config.file=/etc/prometheus/prometheus.yml"
+      - "--storage.tsdb.path=/prometheus"
+      - "--web.enable-lifecycle"
+    ports:
+      - "9090:9090"
+    networks:
+      - tools_net
+    mem_limit: 512m
+    restart: unless-stopped
+    logging: *default-logging
+
+  cadvisor:
+    image: gcr.io/cadvisor/cadvisor:latest
+    volumes:
+      - /:/rootfs:ro
+      - /var/run:/var/run:ro
+      - /sys:/sys:ro
+      - /var/lib/docker/:/var/lib/docker:ro
+    expose:
+      - "8080"
+    networks:
+      - tools_net
+    mem_limit: 256m
+    restart: unless-stopped
+    logging: *default-logging
+
+  loki:
+    image: grafana/loki:latest
+    volumes:
+      - loki_data:/loki
+      - ./loki-config.yml:/etc/loki/local-config.yaml:ro
+    command: -config.file=/etc/loki/local-config.yaml
+    expose:
+      - "3100"
+    networks:
+      - tools_net
+    mem_limit: 256m
+    restart: unless-stopped
+    logging: *default-logging
+
+  promtail:
+    image: grafana/promtail:latest
+    volumes:
+      - ./promtail-config.yml:/etc/promtail/config.yml:ro
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+      - /var/lib/docker/containers:/var/lib/docker/containers:ro
+    command: -config.file=/etc/promtail/config.yml
+    depends_on:
+      - loki
+    networks:
+      - tools_net
+    mem_limit: 128m
+    restart: unless-stopped
+    logging: *default-logging
+
+  grafana:
+    image: grafana/grafana-oss:latest
+    environment:
+      GF_SECURITY_ADMIN_USER: ${GRAFANA_ADMIN_USER:-admin}
+      GF_SECURITY_ADMIN_PASSWORD: ${GRAFANA_ADMIN_PASSWORD}
+      GF_SERVER_ROOT_URL: ${GRAFANA_ROOT_URL:-http://localhost:3004}
+      GF_SERVER_HTTP_PORT: "3000"
+    volumes:
+      - grafana_data:/var/lib/grafana
+      - ./grafana/provisioning:/etc/grafana/provisioning:ro
+    ports:
+      - "3004:3000"
+    depends_on:
+      - prometheus
+      - loki
+    networks:
+      - tools_net
+    mem_limit: 256m
+    restart: unless-stopped
+    logging: *default-logging
+
+  # ---------------------------------------------------------------------------
+  # Outline — self-hosted wiki / knowledge base
+  # Used by support agent for KB articles; memory agent for report storage
+  # ---------------------------------------------------------------------------
+
+  outline:
+    image: outlinewiki/outline:latest
+    environment:
+      DATABASE_URL: postgresql://tools:${TOOLS_POSTGRES_PASSWORD}@tools_postgres:5432/outline
+      REDIS_URL: redis://:${TOOLS_REDIS_PASSWORD}@tools_redis:6379/2
+      SECRET_KEY: ${OUTLINE_SECRET_KEY}
+      UTILS_SECRET: ${OUTLINE_UTILS_SECRET}
+      URL: ${OUTLINE_PUBLIC_URL:-http://localhost:3005}
+      PORT: "3000"
+      FILE_STORAGE: local
+      FILE_STORAGE_LOCAL_ROOT_DIR: /var/lib/outline/data
+      FORCE_HTTPS: "false"
+      ENABLE_UPDATES: "false"
+    volumes:
+      - outline_storage:/var/lib/outline/data
+    ports:
+      - "3005:3000"
+    depends_on:
+      tools_postgres:
+        condition: service_healthy
+      tools_redis:
+        condition: service_healthy
+    networks:
+      - tools_net
+    mem_limit: 256m
+    restart: unless-stopped
+    logging: *default-logging
+
+  # ---------------------------------------------------------------------------
+  # Unleash — self-hosted feature flags (replaces LaunchDarkly)
+  # Used by dev agent for controlled rollouts; launch agent for flag flips
+  # ---------------------------------------------------------------------------
+
+  unleash:
+    image: unleashorg/unleash-server:latest
+    environment:
+      DATABASE_HOST: tools_postgres
+      DATABASE_PORT: "5432"
+      DATABASE_NAME: unleash
+      DATABASE_USERNAME: tools
+      DATABASE_PASSWORD: ${TOOLS_POSTGRES_PASSWORD}
+      DATABASE_SSL: "false"
+      LOG_LEVEL: warn
+      REDIS_URL: redis://:${TOOLS_REDIS_PASSWORD}@tools_redis:6379/3
+    ports:
+      - "3006:4242"
+    depends_on:
+      tools_postgres:
+        condition: service_healthy
+    networks:
+      - tools_net
+    mem_limit: 256m
+    restart: unless-stopped
+    logging: *default-logging

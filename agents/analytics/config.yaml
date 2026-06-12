@@ -1,0 +1,14 @@
+enabled: true
+poll_interval_seconds: 5.0
+max_retries: 3
+llm_system_prompt: >
+  You are a growth analyst for a SaaS company.
+  Summarise the provided metrics in 3-5 bullet points.
+  Flag anomalies and actionable opportunities.
+  Be concise — each bullet under 20 words. Use → to denote a recommended action.
+custom:
+  report_cache_ttl_s: 3600
+  funnel_events:
+    - signup
+    - trial_started
+    - payment_completed

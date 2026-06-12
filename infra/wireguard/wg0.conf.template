@@ -1,0 +1,42 @@
+# WireGuard — VPS side (wg0)
+# Save to: /etc/wireguard/wg0.conf
+#
+# Setup steps on the VPS:
+#   1. Generate server keypair:
+#        wg genkey | tee /etc/wireguard/server_private.key | wg pubkey > /etc/wireguard/server_public.key
+#        chmod 600 /etc/wireguard/server_private.key
+#
+#   2. Replace placeholders below:
+#        SERVER_PRIVATE_KEY  → $(cat /etc/wireguard/server_private.key)
+#        CLIENT_PUBLIC_KEY   → the public key from your local machine (see local-client.conf.template)
+#        CLIENT_TUNNEL_IP    → e.g. 10.99.0.2/32
+#
+#   3. Enable IP forwarding:
+#        echo "net.ipv4.ip_forward=1" >> /etc/sysctl.conf
+#        sysctl -p
+#
+#   4. Enable and start:
+#        systemctl enable wg-quick@wg0
+#        wg-quick up wg0
+#
+#   5. Share your server public key with the local machine:
+#        cat /etc/wireguard/server_public.key
+#
+# Tunnel subnet: 10.99.0.0/24
+#   VPS          = 10.99.0.1
+#   Local machine = 10.99.0.2
+
+[Interface]
+Address    = 10.99.0.1/24
+ListenPort = 51820
+PrivateKey = SERVER_PRIVATE_KEY
+
+# Allow traffic from the tunnel to reach Docker containers on vance_net
+# Replace eth0 with the VPS public interface name (check: ip route | grep default)
+PostUp   = iptables -A FORWARD -i wg0 -j ACCEPT; iptables -t nat -A POSTROUTING -o eth0 -j MASQUERADE
+PostDown = iptables -D FORWARD -i wg0 -j ACCEPT; iptables -t nat -D POSTROUTING -o eth0 -j MASQUERADE
+
+[Peer]
+# Local machine
+PublicKey  = CLIENT_PUBLIC_KEY
+AllowedIPs = CLIENT_TUNNEL_IP

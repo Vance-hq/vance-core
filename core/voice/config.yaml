@@ -1,0 +1,53 @@
+wake_word:
+  model: "hey_vance"               # Model name — looks in wake_word/models/
+  threshold: 0.5                   # Detection confidence threshold (0.0-1.0)
+  inference_framework: "onnx"      # onnx or tflite
+  chunk_size: 1280                 # Audio chunk size in samples (80ms at 16kHz)
+
+audio:
+  sample_rate: 16000               # 16kHz — required by Whisper and OpenWakeWord
+  channels: 1                      # Mono
+  chunk_duration_ms: 80            # Chunk size in milliseconds
+  silence_threshold_ms: 1200       # Stop recording after this much silence
+  max_record_duration_s: 30        # Max single utterance length
+  input_device: null               # null = system default, or set device index
+
+stt:
+  model_size: "base"               # tiny | base | small | medium | large-v3
+                                   # base = ~1GB RAM, ~1.5s on CPU. Upgrade to
+                                   # small/medium when new machine is ready.
+  device: "cpu"                    # cpu | cuda (set to cuda on new GPU machine)
+  compute_type: "int8"             # int8 (CPU optimized) | float16 (GPU)
+  language: "en"
+  beam_size: 5
+  vad_filter: true                 # faster-whisper built-in VAD pre-filter
+
+intent:
+  model: null                      # null = use VANCE_MODEL from shared settings
+  confidence_threshold: 0.7        # Below this: ask for clarification
+  max_context_turns: 5             # How many prior turns to include in intent prompt
+
+tts:
+  model: "tts_models/multilingual/multi-dataset/xtts_v2"
+  speaker_wav: "voice_samples/vance.wav"   # Reference audio for voice cloning
+                                            # Place a clean 6-second WAV here
+                                            # If missing: uses default XTTS voice
+  language: "en"
+  speed: 1.05                      # Slightly faster than default — sounds more natural
+  use_gpu: false                   # Set true on new machine
+
+hotkey:
+  enabled: true                    # PTT fallback always available
+  key_combo: "ctrl+shift+v"        # Customize as needed
+
+orchestrator:
+  url: "http://localhost:7700"     # Local orchestrator endpoint
+  timeout_seconds: 10
+  intent_endpoint: "/intent"
+  health_endpoint: "/health"
+
+feedback:
+  activation_sound: true           # Play a subtle chime on wake word detection
+  activation_sound_file: "assets/chime.wav"
+  error_sound: true
+  speaking_indicator: true         # Print visual indicator when Vance is speaking

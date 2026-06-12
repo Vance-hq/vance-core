@@ -1,0 +1,653 @@
+# Orchestrator routing config.
+# Add new intents here — no Python changes required.
+#
+# Fields per entry:
+#   agent:       target agent name
+#   action:      action to invoke on that agent
+#   description: human-readable summary
+#   priority:    CRITICAL | HIGH | NORMAL | LOW
+#   patterns:    list of phrase fragments — fuzzy-matched against raw_text
+#   fan_out:     optional list of {agent, action, priority} to also dispatch
+#
+# Priority semantics: CRITICAL=1, HIGH=3, NORMAL=5, LOW=8
+
+intents:
+
+  # ---------------------------------------------------------------------------
+  # MARKETING
+  # ---------------------------------------------------------------------------
+
+  - agent: marketing
+    action: generate_copy
+    description: Generate direct-response copy for a product or campaign
+    priority: NORMAL
+    patterns:
+      - "write copy"
+      - "create copy"
+      - "generate copy"
+      - "draft copy"
+      - "write marketing"
+      - "write ad"
+      - "create ad copy"
+      - "write some copy"
+      - "need copy for"
+
+  - agent: marketing
+    action: build_sequence
+    description: Build a multi-step email drip sequence
+    priority: NORMAL
+    patterns:
+      - "build sequence"
+      - "email sequence"
+      - "drip sequence"
+      - "drip campaign"
+      - "nurture sequence"
+      - "create drip"
+      - "build drip"
+      - "follow up sequence"
+      - "email drip"
+
+  - agent: marketing
+    action: create_campaign
+    description: Scaffold a full marketing campaign
+    priority: HIGH
+    patterns:
+      - "create campaign"
+      - "launch campaign"
+      - "new campaign"
+      - "start campaign"
+      - "build campaign"
+      - "fire off campaign"
+      - "send campaign"
+      - "run campaign"
+      - "kick off campaign"
+      - "spin up campaign"
+
+  # ---------------------------------------------------------------------------
+  # OUTREACH
+  # ---------------------------------------------------------------------------
+
+  - agent: outreach
+    action: send_connection
+    description: Send a LinkedIn connection request
+    priority: HIGH
+    patterns:
+      - "send connection"
+      - "connect on linkedin"
+      - "linkedin connect"
+      - "reach out to"
+      - "send invite"
+      - "linkedin invite"
+      - "connect with"
+      - "send connection request"
+
+  - agent: outreach
+    action: detect_replies
+    description: Check for new LinkedIn or email replies
+    priority: NORMAL
+    patterns:
+      - "check replies"
+      - "any replies"
+      - "check messages"
+      - "new messages"
+      - "check inbox"
+      - "any responses"
+      - "check linkedin"
+      - "check email replies"
+      - "any new leads"
+
+  - agent: outreach
+    action: score_lead
+    description: Score a lead against ICP criteria
+    priority: NORMAL
+    patterns:
+      - "score lead"
+      - "evaluate lead"
+      - "qualify lead"
+      - "rate this lead"
+      - "lead score"
+      - "how good is this lead"
+      - "check this lead"
+
+  # ---------------------------------------------------------------------------
+  # ANALYTICS
+  # ---------------------------------------------------------------------------
+
+  - agent: analytics
+    action: revenue_report
+    description: Pull MRR, ARR, and churn from Stripe
+    priority: NORMAL
+    patterns:
+      - "check revenue"
+      - "what's our mrr"
+      - "show mrr"
+      - "pull mrr"
+      - "revenue report"
+      - "show revenue"
+      - "how much revenue"
+      - "what's arr"
+      - "show arr"
+      - "churn report"
+      - "revenue snapshot"
+      - "revenue numbers"
+      - "money coming in"
+
+  - agent: analytics
+    action: funnel_analysis
+    description: Get conversion funnel breakdown from PostHog
+    priority: NORMAL
+    patterns:
+      - "check funnel"
+      - "funnel analysis"
+      - "conversion funnel"
+      - "conversion rate"
+      - "how's the funnel"
+      - "funnel report"
+      - "where are people dropping off"
+      - "signup conversion"
+
+  - agent: analytics
+    action: cohort_report
+    description: Generate a retention cohort report
+    priority: NORMAL
+    patterns:
+      - "cohort report"
+      - "retention report"
+      - "user retention"
+      - "churn analysis"
+      - "cohort analysis"
+      - "how many users stuck around"
+      - "retention numbers"
+
+  # ---------------------------------------------------------------------------
+  # DEV
+  # ---------------------------------------------------------------------------
+
+  - agent: dev
+    action: run_claude_code
+    description: Run a Claude Code task in a target repository
+    priority: NORMAL
+    patterns:
+      - "run claude code"
+      - "claude code task"
+      - "run a code task"
+      - "let claude code"
+      - "have claude fix"
+      - "ask claude to"
+      - "run code task"
+
+  - agent: dev
+    action: git_push
+    description: Commit and push changes to GitHub
+    priority: NORMAL
+    patterns:
+      - "push code"
+      - "push changes"
+      - "commit and push"
+      - "git push"
+      - "push to github"
+      - "push this"
+      - "commit this"
+      - "save and push"
+
+  - agent: dev
+    action: deploy
+    description: Trigger a Vercel deployment
+    priority: HIGH
+    patterns:
+      - "deploy"
+      - "ship it"
+      - "push to prod"
+      - "push to production"
+      - "go live"
+      - "release it"
+      - "release this"
+      - "vercel deploy"
+      - "push live"
+      - "put it live"
+    fan_out:
+      - agent: security
+        action: check_uptime
+        priority: HIGH
+
+  # ---------------------------------------------------------------------------
+  # SECURITY
+  # ---------------------------------------------------------------------------
+
+  - agent: security
+    action: check_uptime
+    description: Run HTTP health checks on all monitored URLs
+    priority: HIGH
+    patterns:
+      - "check uptime"
+      - "is the site up"
+      - "site status"
+      - "uptime check"
+      - "health check"
+      - "are the sites up"
+      - "check all sites"
+
+  - agent: security
+    action: scan_logs
+    description: Scan VPS logs for anomalies or failed auth
+    priority: HIGH
+    patterns:
+      - "scan logs"
+      - "check logs"
+      - "any errors in logs"
+      - "log analysis"
+      - "check error logs"
+      - "any suspicious activity"
+      - "security scan"
+      - "check for errors"
+
+  - agent: security
+    action: send_alert
+    description: Send an alert via email or orchestrator notification
+    priority: CRITICAL
+    patterns:
+      - "send alert"
+      - "alert me"
+      - "notify me"
+      - "alert the team"
+      - "send notification"
+      - "fire an alert"
+
+  # ---------------------------------------------------------------------------
+  # LOCAL RANK GRADER
+  # ---------------------------------------------------------------------------
+
+  - agent: local_rank_grader
+    action: run_audit
+    description: Run a full Google Business Profile audit for a business
+    priority: NORMAL
+    patterns:
+      - "audit this business"
+      - "grade this gbp"
+      - "check google profile"
+      - "run gbp audit"
+      - "audit google listing"
+      - "check business profile"
+      - "grade google business"
+      - "audit local listing"
+      - "check gbp score"
+      - "run local audit"
+
+  - agent: local_rank_grader
+    action: grader_analytics
+    description: Get LocalRankGrader funnel metrics and conversion stats
+    priority: NORMAL
+    patterns:
+      - "grader analytics"
+      - "grader stats"
+      - "grader funnel"
+      - "how many audits"
+      - "grader conversions"
+      - "audit funnel report"
+      - "grader report"
+
+  - agent: local_rank_grader
+    action: auto_publish_result
+    description: Generate monthly anonymised GBP score SEO landing pages
+    priority: LOW
+    patterns:
+      - "publish grader seo"
+      - "generate seo pages"
+      - "publish monthly results"
+      - "grader seo publish"
+
+  # ---------------------------------------------------------------------------
+  # VANCE SYSTEM — meta-commands
+  # ---------------------------------------------------------------------------
+
+  - agent: vance_system
+    action: status
+    description: Report current system status and queue depth
+    priority: NORMAL
+    patterns:
+      - "what's the status"
+      - "status update"
+      - "how are things"
+      - "what's running"
+      - "system status"
+      - "what are you doing"
+      - "what's queued"
+      - "show status"
+      - "give me a status"
+
+  # ---------------------------------------------------------------------------
+  # FORGE — cold outreach engine
+  # ---------------------------------------------------------------------------
+
+  - agent: forge
+    action: build_lead_list
+    description: Scrape and enrich a fresh batch of leads
+    priority: HIGH
+    patterns:
+      - "build leads"
+      - "find leads"
+      - "scrape leads"
+      - "get me leads for"
+      - "fill the pipeline"
+      - "pull leads"
+      - "get leads"
+      - "generate leads"
+      - "prospect list"
+
+  - agent: forge
+    action: launch_sequence
+    description: Start a cold-outreach email sequence for queued leads
+    priority: HIGH
+    patterns:
+      - "launch forge"
+      - "start outreach"
+      - "fire forge"
+      - "run the sequence"
+      - "start the sequence"
+      - "start email campaign"
+      - "run outreach"
+      - "begin outreach"
+
+  - agent: forge
+    action: forge_report
+    description: Show Forge outreach stats — sent, opened, replied, booked
+    priority: NORMAL
+    patterns:
+      - "how is forge doing"
+      - "forge stats"
+      - "outreach numbers"
+      - "sequence performance"
+      - "forge report"
+      - "outreach stats"
+      - "how many replies"
+      - "outreach performance"
+      - "sequence stats"
+
+  - agent: forge
+    action: warm_domain
+    description: Start or continue email domain warm-up rotation
+    priority: NORMAL
+    patterns:
+      - "warm the domain"
+      - "warm up email"
+      - "start warm-up"
+      - "domain warm up"
+      - "warm up the inbox"
+      - "email warm up"
+
+  - agent: forge
+    action: monitor_sequence
+    description: Pause, resume, or monitor an active outreach sequence
+    priority: NORMAL
+    patterns:
+      - "pause forge"
+      - "stop sequence"
+      - "halt outreach"
+      - "pause outreach"
+      - "stop outreach"
+      - "pause the sequence"
+      - "monitor forge"
+
+  # ---------------------------------------------------------------------------
+  # LOCAL RANK GRADER — additional patterns
+  # (core routes already defined above; these extend coverage)
+  # ---------------------------------------------------------------------------
+
+  - agent: local_rank_grader
+    action: run_audit
+    description: Run a GBP audit using the LocalRankGrader engine
+    priority: NORMAL
+    patterns:
+      - "run a grader audit"
+      - "grade their gbp"
+      - "check their google score"
+      - "grader audit"
+      - "run grader"
+      - "gbp score check"
+      - "audit with grader"
+
+  - agent: local_rank_grader
+    action: grader_analytics
+    description: Pull LocalRankGrader funnel and lead metrics
+    priority: NORMAL
+    patterns:
+      - "grader performance"
+      - "grader funnel numbers"
+      - "audit lead stats"
+      - "how many grader leads"
+
+  # ---------------------------------------------------------------------------
+  # INTEGRATIONS — Infrastructure
+  # ---------------------------------------------------------------------------
+
+  - agent: integrations
+    action: call_service
+    description: Trigger a Vercel deployment via the integrations layer
+    priority: HIGH
+    default_args: {service: vercel, method: trigger_deploy}
+    patterns:
+      - "deploy via integrations"
+      - "trigger vercel deploy"
+      - "deploy to vercel"
+      - "vercel trigger"
+      - "fire deploy"
+
+  - agent: integrations
+    action: call_service
+    description: Roll back to the previous Vercel deployment
+    priority: CRITICAL
+    default_args: {service: vercel, method: rollback}
+    patterns:
+      - "rollback"
+      - "revert production"
+      - "undo deploy"
+      - "something broke roll it back"
+      - "roll back production"
+      - "revert the deploy"
+      - "rollback vercel"
+
+  - agent: integrations
+    action: call_service
+    description: Purge Cloudflare edge cache
+    priority: HIGH
+    default_args: {service: cloudflare, method: purge_cache}
+    patterns:
+      - "purge cache"
+      - "clear cloudflare"
+      - "bust the cache"
+      - "clear the cache"
+      - "invalidate cache"
+      - "flush cloudflare"
+      - "cloudflare purge"
+
+  # ---------------------------------------------------------------------------
+  # INTEGRATIONS — Communications
+  # ---------------------------------------------------------------------------
+
+  - agent: integrations
+    action: call_service
+    description: Send an SMS via Twilio
+    priority: NORMAL
+    default_args: {service: twilio, method: send_sms}
+    patterns:
+      - "text me"
+      - "send me an sms"
+      - "text my phone"
+      - "send sms"
+      - "send a text"
+      - "twilio sms"
+      - "text to"
+
+  - agent: integrations
+    action: call_service
+    description: Post a message to a Slack channel
+    priority: NORMAL
+    default_args: {service: slack, method: send_message}
+    patterns:
+      - "slack message"
+      - "post to slack"
+      - "send slack"
+      - "slack this"
+      - "message slack"
+      - "post in slack"
+      - "drop in slack"
+      - "ping slack"
+
+  - agent: integrations
+    action: call_service
+    description: Check upcoming Calendly scheduled events
+    priority: NORMAL
+    default_args: {service: calendly, method: get_scheduled_events}
+    patterns:
+      - "what's on my calendar"
+      - "upcoming meetings"
+      - "my calendly"
+      - "check my calendar"
+      - "what do i have scheduled"
+      - "show my meetings"
+      - "calendly schedule"
+      - "what meetings do i have"
+
+  # ---------------------------------------------------------------------------
+  # INTEGRATIONS — Finance
+  # ---------------------------------------------------------------------------
+
+  - agent: integrations
+    action: call_service
+    description: Pull QuickBooks profit and loss report
+    priority: NORMAL
+    default_args: {service: quickbooks, method: get_profit_loss}
+    patterns:
+      - "quickbooks"
+      - "p&l"
+      - "profit and loss"
+      - "expenses"
+      - "accounting report"
+      - "quickbooks report"
+      - "show p and l"
+      - "financial report"
+      - "books report"
+
+  - agent: integrations
+    action: call_service
+    description: List Square POS transactions
+    priority: NORMAL
+    default_args: {service: square, method: list_transactions}
+    patterns:
+      - "square sales"
+      - "pos report"
+      - "trusted plumbing revenue"
+      - "square transactions"
+      - "pos sales"
+      - "square revenue"
+      - "point of sale report"
+
+  # ---------------------------------------------------------------------------
+  # INTEGRATIONS — Google
+  # ---------------------------------------------------------------------------
+
+  - agent: integrations
+    action: call_service
+    description: Pull GA4 session and traffic data
+    priority: NORMAL
+    default_args: {service: google_analytics, method: get_sessions}
+    patterns:
+      - "google analytics"
+      - "site traffic"
+      - "how many visitors"
+      - "website stats"
+      - "ga4 report"
+      - "traffic report"
+      - "sessions today"
+      - "how much traffic"
+      - "website visitors"
+
+  - agent: integrations
+    action: call_service
+    description: Get Google Ads campaign performance metrics
+    priority: NORMAL
+    default_args: {service: google_ads, method: get_performance}
+    patterns:
+      - "check google ads"
+      - "ads performance"
+      - "how are the google ads doing"
+      - "google ads report"
+      - "ads metrics"
+      - "campaign performance"
+      - "google ads stats"
+      - "how are the ads doing"
+
+  - agent: integrations
+    action: call_service
+    description: Update or post to Google Business Profile
+    priority: NORMAL
+    default_args: {service: google_business_profile, method: create_post}
+    patterns:
+      - "update gbp"
+      - "update the listing"
+      - "post to google"
+      - "google business update"
+      - "gbp post"
+      - "update google listing"
+      - "post to google business"
+      - "google my business update"
+
+  # ---------------------------------------------------------------------------
+  # INTEGRATIONS — CRM (Twenty)
+  # ---------------------------------------------------------------------------
+
+  - agent: integrations
+    action: call_service
+    description: Search for a contact in Twenty CRM
+    priority: NORMAL
+    default_args: {service: twenty_crm, method: list_contacts}
+    patterns:
+      - "look up contact"
+      - "find contact"
+      - "who is"
+      - "contact info"
+      - "search crm"
+      - "find in crm"
+      - "look up in crm"
+      - "crm lookup"
+      - "find the contact"
+
+  - agent: integrations
+    action: call_service
+    description: Create a new contact in Twenty CRM
+    priority: NORMAL
+    default_args: {service: twenty_crm, method: create_contact}
+    patterns:
+      - "add contact"
+      - "new contact"
+      - "add to crm"
+      - "create contact"
+      - "add them to crm"
+      - "put in crm"
+      - "add to twenty"
+      - "save contact to crm"
+
+  # ---------------------------------------------------------------------------
+  # VANCE SYSTEM — meta-commands
+  # ---------------------------------------------------------------------------
+
+  - agent: vance_system
+    action: status
+    description: Report current system status and queue depth
+    priority: NORMAL
+    patterns:
+      - "what's the status"
+      - "status update"
+      - "how are things"
+      - "what's running"
+      - "system status"
+      - "what are you doing"
+      - "what's queued"
+      - "show status"
+      - "give me a status"
+
+  - agent: vance_system
+    action: unknown
+    description: Fallback when no intent can be determined
+    priority: NORMAL
+    patterns: []

@@ -1,0 +1,9 @@
+enabled: true
+poll_interval_seconds: 2.0
+max_retries: 3
+llm_system_prompt: >
+  You are a direct-response copywriter and marketing strategist for local business SaaS products.
+  Use Hook-Story-Offer structure. Be persuasive, specific, and conversion-focused.
+custom:
+  default_tone: direct-response
+  sequence_max_steps: 7

@@ -1,0 +1,29 @@
+enabled: true
+poll_interval_seconds: 5.0
+max_retries: 3
+llm_system_prompt: >
+  You are a cold outreach specialist for local business SaaS products.
+  Write personalized, specific, human-sounding cold emails that get replies.
+  Never be salesy. Lead with a specific observation about their business.
+  Keep subject lines under 7 words. Keep first emails under 90 words.
+custom:
+  hourly_send_limit: 40
+  daily_send_limit: 200
+  hot_lead_threshold: 60
+  bounce_rate_alert_threshold: 0.08
+  min_sends_for_optimize: 200
+  warm_up_schedule_daily: [10, 25, 50, 100]
+  target_personas:
+    starpio:
+      - restaurant owners
+      - multi-location retail owners
+      - salon and spa owners
+      - agency owners
+    oneserv:
+      - HVAC company owners
+      - plumbing company owners
+      - electrical contractors
+    localoutrank:
+      - local business owners with Google Business listing
+    localrankgrader:
+      - local business owners with Google Business listing
