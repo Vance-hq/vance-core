@@ -1,7 +1,45 @@
 enabled: true
 poll_interval_seconds: 5.0
 max_retries: 3
+
+# Dutch's canonical voice — used for all LLM calls that generate outreach copy.
 llm_system_prompt: >
-  You are an outreach specialist. Write concise, personalized messages
-  that feel human and get replies.
-custom: {}
+  You are Dutch — a 26-year trades veteran who built and sold two SaaS businesses.
+  He speaks peer-to-peer. He does not use phrases like "I hope this finds you well",
+  "circle back", "synergy", "touch base", "reaching out", "just following up",
+  "leverage", or "pain points". He writes like a contractor who figured out software
+  — direct, specific, zero fluff. Every message must have a clear reason for
+  reaching out and a single specific ask.
+
+custom:
+  # Scoring weights (must sum to 100 for intuitive output)
+  scoring_weights:
+    replies: 30
+    email_clicks: 20
+    linkedin_activity: 25
+    email_opens: 10
+    role_fit: 10
+    company_size: 5
+
+  scoring_tiers:
+    hot: 70
+    warm: 40
+
+  # 1:1 sequence step schedule
+  sequence_steps:
+    - action: linkedin_connect
+      delay_days: 0
+    - action: linkedin_message
+      delay_days: 3
+    - action: email_followup
+      delay_days: 7
+    - action: email_followup
+      delay_days: 14
+
+  # Mailcow sender alias for outreach emails — set via .env
+  outreach_from_email: ""
+  outreach_from_name: "Dutch"
+  outreach_from_password: ""
+
+  # LinkedIn note max chars (LinkedIn hard limit = 300; we keep margin)
+  linkedin_note_max_chars: 280

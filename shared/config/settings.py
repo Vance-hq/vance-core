@@ -59,6 +59,14 @@ class Settings:
     # Playwright — browser automation (replaces Apify/Browserless)
     PLAYWRIGHT_BROWSERS_PATH: str = os.getenv("PLAYWRIGHT_BROWSERS_PATH", "/ms-playwright")
 
+    # LinkedIn credentials (used by outreach agent — Playwright browser automation)
+    LINKEDIN_EMAIL: str = os.getenv("LINKEDIN_EMAIL", "")
+    LINKEDIN_PASSWORD: str = os.getenv("LINKEDIN_PASSWORD", "")
+
+    # Outreach agent sender alias
+    OUTREACH_FROM_EMAIL: str = os.getenv("OUTREACH_FROM_EMAIL", "")
+    OUTREACH_FROM_PASSWORD: str = os.getenv("OUTREACH_FROM_PASSWORD", "")
+
     # Image generation backend (comfyui = self-hosted GPU; replicate = pay-per-use interim)
     IMAGE_BACKEND: str = os.getenv("IMAGE_BACKEND", "replicate")
     REPLICATE_API_TOKEN: str = os.getenv("REPLICATE_API_TOKEN", "")

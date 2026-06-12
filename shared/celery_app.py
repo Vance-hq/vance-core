@@ -96,9 +96,9 @@ app.conf.beat_schedule = {
         "task": "agents.marketing.tasks.trend_monitor",
         "schedule": 3_600.0,
     },
-    "outreach-reply-check": {
-        "task": "agents.outreach.tasks.check_replies",
-        "schedule": 300.0,
+    "outreach-dispatch-due-sequences": {
+        "task": "agents.outreach.tasks.dispatch_due_sequences",
+        "schedule": 300.0,  # every 5 minutes
     },
     "analytics-revenue-snapshot": {
         "task": "agents.analytics.tasks.revenue_snapshot",
