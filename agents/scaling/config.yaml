@@ -1,0 +1,45 @@
+enabled: true
+poll_interval_seconds: 60.0
+max_retries: 3
+
+llm_system_prompt: ""  # scaling agent does not use LLM
+
+custom:
+  # Prometheus URL (used for supplemental metric queries)
+  prometheus_url: ""  # falls back to settings.PROMETHEUS_URL
+
+  # Alert thresholds
+  thresholds:
+    cpu_warning_pct: 80.0
+    cpu_warning_window_min: 5
+    cpu_critical_pct: 95.0
+    cpu_critical_window_min: 2
+    memory_warning_pct: 85.0
+    disk_warning_pct: 80.0
+    disk_critical_pct: 90.0
+
+  # Capacity planning limits — when to project a breach
+  capacity_limits:
+    cpu_pct: 90.0
+    memory_pct: 90.0
+    disk_pct: 85.0
+
+  # Processes considered normal (high CPU from these is not flagged as unexpected)
+  known_processes:
+    - python3
+    - python
+    - node
+    - nginx
+    - postgres
+    - redis-server
+    - celery
+    - docker
+    - dockerd
+    - containerd
+    - sshd
+    - systemd
+    - prometheus
+    - grafana
+    - loki
+    - promtail
+    - pg_dump

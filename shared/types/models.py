@@ -26,6 +26,7 @@ class AgentCapability(str, Enum):
     DEV = "dev"
     BACKUP = "backup"
     DEPLOY = "deploy"
+    SCALING = "scaling"
     FINANCE = "finance"
     SECURITY = "security"
     FORGE = "forge"
