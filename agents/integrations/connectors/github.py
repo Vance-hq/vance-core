@@ -148,3 +148,46 @@ class GitHubConnector(BaseConnector):
             headers=self._headers,
         )
         return resp.json()
+
+    def list_issues(self, repo: str, labels: list[str] | None = None, state: str = "open") -> list[dict]:
+        """List issues for a repo, optionally filtered by labels."""
+        params: dict[str, Any] = {"state": state, "per_page": 100}
+        if labels:
+            params["labels"] = ",".join(labels)
+        resp = self.request(
+            "GET",
+            f"{_BASE}/repos/{self._org}/{repo}/issues",
+            params=params,
+            headers=self._headers,
+        )
+        return resp.json()
+
+    def post_pr_comment(self, repo: str, pr_number: int, body: str) -> dict:
+        """Post a comment on a pull request."""
+        resp = self.request(
+            "POST",
+            f"{_BASE}/repos/{self._org}/{repo}/issues/{pr_number}/comments",
+            json={"body": body},
+            headers=self._headers,
+        )
+        return resp.json()
+
+    def add_label(self, repo: str, issue_number: int, label: str) -> dict:
+        """Add a label to an issue or PR."""
+        resp = self.request(
+            "POST",
+            f"{_BASE}/repos/{self._org}/{repo}/issues/{issue_number}/labels",
+            json={"labels": [label]},
+            headers=self._headers,
+        )
+        return resp.json()
+
+    def list_releases(self, repo: str, limit: int = 10) -> list[dict]:
+        """List releases for a repo, most recent first."""
+        resp = self.request(
+            "GET",
+            f"{_BASE}/repos/{self._org}/{repo}/releases",
+            params={"per_page": limit},
+            headers=self._headers,
+        )
+        return resp.json()

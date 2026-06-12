@@ -1,0 +1,72 @@
+enabled: true
+poll_interval_seconds: 5.0
+max_retries: 3
+
+llm_system_prompt: >
+  You are a release engineer. Write release notes that are clear and user-facing.
+  Focus on what changed for the user, not internal implementation details.
+
+custom:
+  repos_path: "/repos"
+  subprocess_timeout_s: 300
+  deploy_poll_interval_s: 5
+
+  # GitHub
+  github_token: ""
+  github_org: "vance-hq"
+
+  # Staging DB URL for schema sync
+  staging_db_url: ""
+
+  # Blackout windows — no production deploys during these periods
+  # days: 0=Mon, 1=Tue, ..., 4=Fri, 5=Sat, 6=Sun
+  blackout_windows:
+    - days: [4, 5, 6]    # Fri 17:00 → Mon 09:00
+      start_hour: 17
+      end_hour: 24
+    - days: [5, 6]
+      start_hour: 0
+      end_hour: 24
+    - days: [0]           # Mon 00:00 → 09:00
+      start_hour: 0
+      end_hour: 9
+
+  # Active repos
+  repos:
+    vance-app:
+      type: node
+      vercel_project_id: ""
+      default_branch: main
+      staging_url: ""
+      seed_cmd: "npm run db:seed"
+
+    vance-core:
+      type: python
+      vercel_project_id: ""
+      default_branch: main
+      staging_url: ""
+      seed_cmd: ""
+
+    localoutrank-landing:
+      type: node
+      vercel_project_id: ""
+      default_branch: main
+      staging_url: ""
+
+    starpio-landing:
+      type: node
+      vercel_project_id: ""
+      default_branch: main
+      staging_url: ""
+
+    oneserv-landing:
+      type: node
+      vercel_project_id: ""
+      default_branch: main
+      staging_url: ""
+
+    trusted-plumbing-site:
+      type: node
+      vercel_project_id: ""
+      default_branch: main
+      staging_url: ""
