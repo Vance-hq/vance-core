@@ -1,0 +1,55 @@
+enabled: true
+poll_interval_seconds: 5.0
+max_retries: 3
+
+llm_system_prompt: >
+  You are a performance marketing specialist for B2B SaaS products targeting
+  small businesses in the trades, restaurant, and local SEO categories.
+  Write ad copy that is direct, specific, and addresses a real business problem.
+  No buzzwords. No vague claims. Every headline must pass the "so what?" test.
+
+custom:
+  # Minimum daily budget — never reduce below this
+  min_daily_budget: 5.00
+
+  # Performance thresholds — CPA pause at 1.5x, ROAS scale at 1.2x
+  cpa_pause_multiplier: 1.5
+  roas_scale_multiplier: 1.2
+  consecutive_cpa_breach_days: 3
+
+  # Budget scale increment on ROAS win
+  budget_scale_pct: 0.20
+
+  # Creative rotation triggers
+  ctr_drop_threshold: 0.20   # 20% week-over-week drop
+  frequency_threshold: 3.0   # Meta: avg frequency above this triggers rotation
+
+  # A/B test conclusion threshold (impressions)
+  ab_min_impressions: 500
+
+  # Audience expansion — monthly (28-day cadence)
+  audience_expand_days: 28
+
+  # Target defaults by product (override per campaign at creation time)
+  product_targets:
+    starpio:
+      target_cpa: 25.00
+      target_roas: 3.0
+    oneserv:
+      target_cpa: 40.00
+      target_roas: 2.5
+    localoutrank:
+      target_cpa: 30.00
+      target_roas: 3.0
+    trusted_plumbing:
+      target_cpa: 35.00
+      target_roas: 2.5
+
+  # Slack channel for performance alerts
+  alert_channel: "#ads"
+
+  # Google Ads conversion action resource name (must be configured before launch)
+  google_conversion_action: ""
+
+  # Meta pixel ID (must be configured before launch)
+  meta_pixel_id: ""

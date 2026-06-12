@@ -161,4 +161,20 @@ app.conf.beat_schedule = {
         "task": "agents.reviews.tasks.check_reputation_scores",
         "schedule": 86_400.0,  # daily
     },
+    "ads-daily-monitor": {
+        "task": "agents.ads.tasks.daily_monitor_performance",
+        "schedule": 86_400.0,
+    },
+    "ads-daily-rotate-creative": {
+        "task": "agents.ads.tasks.daily_rotate_creative",
+        "schedule": 86_400.0,
+    },
+    "ads-weekly-budget-realloc": {
+        "task": "agents.ads.tasks.weekly_budget_realloc",
+        "schedule": 7 * 86_400.0,
+    },
+    "ads-monthly-audience-expand": {
+        "task": "agents.ads.tasks.monthly_audience_expand",
+        "schedule": 28 * 86_400.0,
+    },
 }
