@@ -20,6 +20,7 @@ class AgentCapability(str, Enum):
     MARKETING = "marketing"
     OUTREACH = "outreach"
     SALES = "sales"
+    REVIEWS = "reviews"
     ANALYTICS = "analytics"
     DEV = "dev"
     SECURITY = "security"

@@ -71,6 +71,17 @@ class Settings:
     SALES_FROM_EMAIL: str = os.getenv("SALES_FROM_EMAIL", "")
     SALES_FROM_PASSWORD: str = os.getenv("SALES_FROM_PASSWORD", "")
 
+    # Reviews agent
+    YELP_API_KEY: str = os.getenv("YELP_API_KEY", "")
+    FACEBOOK_PAGE_ACCESS_TOKEN: str = os.getenv("FACEBOOK_PAGE_ACCESS_TOKEN", "")
+    TRUSTED_PLUMBING_GBP_ACCOUNT: str = os.getenv("TRUSTED_PLUMBING_GBP_ACCOUNT", "")
+    TRUSTED_PLUMBING_GBP_LOCATION: str = os.getenv("TRUSTED_PLUMBING_GBP_LOCATION", "")
+    TRUSTED_PLUMBING_YELP_BUSINESS_ID: str = os.getenv("TRUSTED_PLUMBING_YELP_BUSINESS_ID", "")
+    TRUSTED_PLUMBING_FACEBOOK_PAGE_ID: str = os.getenv("TRUSTED_PLUMBING_FACEBOOK_PAGE_ID", "")
+    REVIEWS_ALERT_CHANNEL: str = os.getenv("REVIEWS_ALERT_CHANNEL", "#reviews")
+    REVIEWS_FROM_EMAIL: str = os.getenv("REVIEWS_FROM_EMAIL", "")
+    REVIEWS_FROM_PASSWORD: str = os.getenv("REVIEWS_FROM_PASSWORD", "")
+
     # Image generation backend (comfyui = self-hosted GPU; replicate = pay-per-use interim)
     IMAGE_BACKEND: str = os.getenv("IMAGE_BACKEND", "replicate")
     REPLICATE_API_TOKEN: str = os.getenv("REPLICATE_API_TOKEN", "")

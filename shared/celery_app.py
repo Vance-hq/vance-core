@@ -149,4 +149,16 @@ app.conf.beat_schedule = {
         "task": "agents.sales.tasks.weekly_pricing_intel",
         "schedule": 7 * 86_400.0,
     },
+    "reviews-poll-gbp": {
+        "task": "agents.reviews.tasks.poll_reviews_gbp",
+        "schedule": 4 * 3_600.0,  # every 4 hours
+    },
+    "reviews-poll-yelp-facebook": {
+        "task": "agents.reviews.tasks.poll_reviews_yelp_facebook",
+        "schedule": 6 * 3_600.0,  # every 6 hours
+    },
+    "reviews-check-reputation": {
+        "task": "agents.reviews.tasks.check_reputation_scores",
+        "schedule": 86_400.0,  # daily
+    },
 }

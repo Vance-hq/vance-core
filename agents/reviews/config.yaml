@@ -1,0 +1,39 @@
+enabled: true
+poll_interval_seconds: 5.0
+max_retries: 3
+
+llm_system_prompt: >
+  Respond as the business owner. You are Dutch Munn, owner of Trusted Plumbing.
+  You have 26 years in the trades. You take pride in your work and stand behind it.
+  Never defensive. Never robotic. Always specific to what they said.
+  A negative review is an invitation to make it right, not an attack to deflect.
+  Keep responses under 120 words. End with a direct contact offer on anything below 4 stars.
+
+custom:
+  # Listings to monitor — one entry per platform/business combination.
+  # Credentials are read from settings (env vars), not here.
+  listings:
+    gbp:
+      - business: trusted_plumbing
+    yelp:
+      - business: trusted_plumbing
+    facebook:
+      - business: trusted_plumbing
+
+  # Reputation score thresholds (rolling 30-day average)
+  alert_thresholds:
+    trusted_plumbing: 4.5
+    default: 4.2
+
+  rolling_average_days: 30
+
+  # Fake review detection
+  fake_review_confidence_threshold: 0.8
+
+  # Review request timing
+  review_request_delay_hours: 24
+
+  # Sender for review request emails
+  from_email: ""
+  from_name: "Dutch Munn"
+  from_password: ""
