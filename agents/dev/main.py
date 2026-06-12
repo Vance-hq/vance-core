@@ -1,84 +1,136 @@
-"""Dev agent — Claude Code subprocess runner, Git operations, Vercel deployments."""
+"""
+Dev agent — autonomous software builds, bug fixes, deployments, and dependency updates.
+
+Actions:
+  build_feature      — build a feature via Claude Code subprocess + PR
+  fix_bug            — fix a GitHub issue via Claude Code + close issue on PR
+  run_tests          — execute test suite, enqueue fix_bug on failure
+  deploy             — trigger Vercel deploy, poll, rollback on failure
+  dependency_update  — update minor/patch deps automatically; flag major updates
+  hotfix             — emergency fix: commit to main, deploy, create post-mortem
+"""
 
 from __future__ import annotations
 
-import os
-import subprocess
 from typing import Any
 
-from agents._base import BaseAgent, AgentConfig
-from agents.integrations.connectors.vercel import VercelConnector
+from agents._base import AgentConfig, BaseAgent
 from shared.logger import get_logger
 from shared.types import Task, TaskResult
 
-logger = get_logger(__name__)
+from .builder import Builder
+from .db import DevDB
+from .dep_updater import DependencyUpdater
+from .deployer import Deployer
+from .test_runner import TestRunner
 
-REPOS_PATH = os.environ.get("REPOS_PATH", "/repos")
+logger = get_logger(__name__)
 
 
 class DevAgent(BaseAgent):
 
+    def __init__(self, agent_name: str, config: AgentConfig) -> None:
+        super().__init__(agent_name, config)
+        cfg = config.custom
+        self._db = DevDB()
+        self._builder = Builder(self._db, cfg)
+        self._test_runner = TestRunner(self._db, cfg)
+        self._deployer = Deployer(self._db, cfg)
+        self._dep_updater = DependencyUpdater(self._db, cfg)
+
     def handle(self, task: Task) -> TaskResult:
         action = task.payload.get("action")
+        p = task.payload
 
-        if action == "run_claude_code":
-            return self._run_claude_code(task)
-        if action == "git_push":
-            return self._git_push(task)
-        if action == "deploy":
-            return self._deploy(task)
+        dispatch = {
+            "build_feature":     lambda: self._handle_build_feature(p),
+            "fix_bug":           lambda: self._handle_fix_bug(p),
+            "run_tests":         lambda: self._handle_run_tests(p),
+            "deploy":            lambda: self._handle_deploy(p),
+            "dependency_update": lambda: self._handle_dep_update(p),
+            "hotfix":            lambda: self._handle_hotfix(p),
+        }
 
-        return TaskResult(task_id=task.id, success=False, output={"error": f"unknown action: {action}"})
+        handler = dispatch.get(action)
+        if not handler:
+            return TaskResult(
+                task_id=task.id,
+                success=False,
+                output={"error": f"Unknown dev action: {action}"},
+            )
+
+        logger.info("dev_task_started", action=action, task_id=task.id)
+        output = handler()
+        return TaskResult(task_id=task.id, success=True, output=output)
 
     def health_check(self) -> bool:
-        return True
+        try:
+            self._db.get_recent_deployments(repo="vance-app", limit=1)
+            return True
+        except Exception:
+            return False
 
-    # ------------------------------------------------------------------
-
-    def _run_claude_code(self, task: Task) -> TaskResult:
-        prompt = task.payload.get("prompt", "")
-        repo = task.payload.get("repo", "")
-        working_dir = os.path.join(REPOS_PATH, repo) if repo else REPOS_PATH
-
-        result = subprocess.run(
-            ["claude", "-p", prompt, "--output-format", "json"],
-            capture_output=True,
-            text=True,
-            cwd=working_dir,
-            timeout=300,
-        )
-        return TaskResult(
-            task_id=task.id,
-            success=result.returncode == 0,
-            output={"stdout": result.stdout, "stderr": result.stderr, "returncode": result.returncode},
+    def _handle_build_feature(self, p: dict[str, Any]) -> dict[str, Any]:
+        repo = p.get("repo", "")
+        feature_description = p.get("feature_description", "")
+        acceptance_criteria = p.get("acceptance_criteria", "")
+        target_branch = p.get("target_branch", "")
+        if not all([repo, feature_description, acceptance_criteria, target_branch]):
+            return {"error": "repo, feature_description, acceptance_criteria, target_branch required"}
+        return self._builder.build_feature(
+            repo=repo,
+            feature_description=feature_description,
+            acceptance_criteria=acceptance_criteria,
+            target_branch=target_branch,
         )
 
-    def _git_push(self, task: Task) -> TaskResult:
-        repo = task.payload.get("repo", "")
-        message = task.payload.get("message", "chore: automated commit")
-        working_dir = os.path.join(REPOS_PATH, repo) if repo else REPOS_PATH
+    def _handle_fix_bug(self, p: dict[str, Any]) -> dict[str, Any]:
+        repo = p.get("repo", "")
+        issue_number = p.get("issue_number", 0)
+        if not repo or not issue_number:
+            return {"error": "repo and issue_number required"}
+        return self._builder.fix_bug(
+            repo=repo,
+            issue_number=int(issue_number),
+            issue_body=p.get("issue_body", ""),
+            error_logs=p.get("error_logs", ""),
+        )
 
-        cmds = [
-            ["git", "add", "-A"],
-            ["git", "commit", "-m", message],
-            ["git", "push"],
-        ]
-        for cmd in cmds:
-            result = subprocess.run(cmd, capture_output=True, text=True, cwd=working_dir)
-            if result.returncode != 0:
-                return TaskResult(
-                    task_id=task.id,
-                    success=False,
-                    output={"error": result.stderr, "cmd": " ".join(cmd)},
-                )
-        return TaskResult(task_id=task.id, success=True, output={"message": message})
+    def _handle_run_tests(self, p: dict[str, Any]) -> dict[str, Any]:
+        repo = p.get("repo", "")
+        if not repo:
+            return {"error": "repo required"}
+        return self._test_runner.run(
+            repo=repo,
+            test_type=p.get("test_type", "unit"),
+        )
 
-    def _deploy(self, task: Task) -> TaskResult:
-        project = task.payload.get("project", "")
-        environment = task.payload.get("environment", "production")
-        vercel = VercelConnector(called_by="dev", method_name="deploy")
-        result = vercel.deploy(project_id=project, target=environment)
-        return TaskResult(task_id=task.id, success=True, output=result)
+    def _handle_deploy(self, p: dict[str, Any]) -> dict[str, Any]:
+        repo = p.get("repo", "")
+        if not repo:
+            return {"error": "repo required"}
+        return self._deployer.deploy(
+            repo=repo,
+            environment=p.get("environment", "production"),
+            task_id=p.get("task_id", ""),
+        )
+
+    def _handle_dep_update(self, p: dict[str, Any]) -> dict[str, Any]:
+        repo = p.get("repo", "")
+        if not repo:
+            return {"error": "repo required"}
+        return self._dep_updater.update(repo=repo)
+
+    def _handle_hotfix(self, p: dict[str, Any]) -> dict[str, Any]:
+        repo = p.get("repo", "")
+        description = p.get("description", "")
+        if not repo or not description:
+            return {"error": "repo and description required"}
+        return self._builder.hotfix(
+            repo=repo,
+            description=description,
+            error_context=p.get("error_context", ""),
+        )
 
 
 if __name__ == "__main__":

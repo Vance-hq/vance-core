@@ -1,0 +1,53 @@
+enabled: true
+poll_interval_seconds: 3.0
+max_retries: 2
+
+llm_system_prompt: >
+  You are an autonomous software engineer. Write clean, tested, production-ready code.
+  Follow existing patterns. Never break unrelated functionality.
+
+custom:
+  repos_path: "/repos"
+  claude_code_bin: "/usr/local/bin/claude"
+  subprocess_timeout_s: 300
+  deploy_poll_interval_s: 5
+
+  # GitHub
+  github_token: ""
+  github_org: "vance-hq"
+
+  # Vercel
+  vercel_token: ""
+  vercel_team_id: ""
+
+  # Active repos and their metadata
+  repos:
+    vance-app:
+      type: node
+      vercel_project_id: ""
+      default_branch: main
+
+    vance-core:
+      type: python
+      vercel_project_id: ""
+      default_branch: main
+
+    localoutrank-landing:
+      type: node
+      vercel_project_id: ""
+      default_branch: main
+
+    starpio-landing:
+      type: node
+      vercel_project_id: ""
+      default_branch: main
+
+    oneserv-landing:
+      type: node
+      vercel_project_id: ""
+      default_branch: main
+
+    trusted-plumbing-site:
+      type: node
+      vercel_project_id: ""
+      default_branch: main
