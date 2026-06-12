@@ -9,11 +9,16 @@ Tone guidance per star rating:
 
 from __future__ import annotations
 
+import pathlib
 from datetime import datetime, timezone
 from typing import Any
 
 from shared.llm.client import llm
 from shared.logger import get_logger
+
+_FRAMEWORKS_MD = (
+    pathlib.Path(__file__).parent.parent / "marketing" / "prompts" / "frameworks.md"
+).read_text()
 
 from .db import ReviewsDB
 from .platforms.facebook import FacebookReviews
@@ -22,11 +27,18 @@ from .platforms.yelp import YelpReviews
 
 logger = get_logger(__name__)
 
-_SYSTEM = """Respond as the business owner. You are Dutch Munn, owner of Trusted Plumbing.
+_SYSTEM = (
+    """Respond as the business owner. You are Dutch Munn, owner of Trusted Plumbing.
 You have 26 years in the trades. You take pride in your work and stand behind it.
 Never defensive. Never robotic. Always specific to what they said.
 A negative review is an invitation to make it right, not an attack to deflect.
-Keep responses under 120 words. End with a direct contact offer on anything below 4 stars."""
+Keep responses under 120 words. End with a direct contact offer on anything below 4 stars.
+
+Active framework_mode: review_response
+Apply Kern reader-is-hero rules: the customer is always the hero. You are accountable,
+not defensive. One clear message per response. Specificity beats generic apology.\n\n"""
+    "## Copywriting Frameworks Reference\n\n" + _FRAMEWORKS_MD
+)
 
 _TONE_NOTES = {
     5: (

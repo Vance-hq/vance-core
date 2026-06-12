@@ -18,10 +18,16 @@ import json
 from datetime import datetime, timedelta, timezone
 from typing import Any
 
+import pathlib
+
 from shared.config.settings import settings
 from shared.llm.client import llm
 from shared.logger import get_logger
 from shared.queue.queue import TaskQueue
+
+_FRAMEWORKS_MD = (
+    pathlib.Path(__file__).parent.parent / "marketing" / "prompts" / "frameworks.md"
+).read_text()
 
 from .db import GraderDB
 from .email import GraderMailer
@@ -30,6 +36,9 @@ logger = get_logger(__name__)
 
 # Step index → delay in days after report delivery
 _STEP_DELAYS = {2: 3, 3: 7, 4: 14, 5: 21}
+
+# framework_mode per step: 2=grader_nurture, 3=sequence_early, 4=grader_nurture, 5=sequence_offer
+_STEP_FRAMEWORK_MODE = {2: "grader_nurture", 3: "sequence_early", 4: "grader_nurture", 5: "sequence_offer"}
 
 _STEP_PROMPTS = {
     2: """
@@ -207,10 +216,17 @@ class NurtureSequencer:
             city=city,
         )
 
+        framework_mode = _STEP_FRAMEWORK_MODE.get(step, "sequence_early")
+        system = (
+            "You are a direct-response email copywriter. Output only valid JSON.\n\n"
+            "## Copywriting Frameworks Reference\n\n" + _FRAMEWORKS_MD + "\n\n"
+            f"Active framework_mode: {framework_mode}"
+        )
         raw = llm.complete(
             messages=[{"role": "user", "content": prompt}],
-            system="You are a direct-response email copywriter. Output only valid JSON.",
+            system=system,
             max_tokens=600,
+            metadata={"caller": "localrankgrader.nurture", "framework_mode": framework_mode},
         )
         block = raw.content[0]
         text = block.text.strip() if hasattr(block, "text") else ""

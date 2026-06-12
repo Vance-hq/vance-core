@@ -13,9 +13,15 @@ from __future__ import annotations
 
 from typing import Any
 
+import pathlib
+
 from shared.llm.client import llm
 from shared.logger import get_logger
 from shared.queue.queue import TaskQueue
+
+_FRAMEWORKS_MD = (
+    pathlib.Path(__file__).parent.parent / "marketing" / "prompts" / "frameworks.md"
+).read_text()
 
 from .db import SalesDB
 from .mailer import SalesMailer, DUTCH_VOICE
@@ -24,23 +30,33 @@ logger = get_logger(__name__)
 
 _WIN_BACK_COOLDOWN_DAYS = 90
 
-_STEP1_SYSTEM = DUTCH_VOICE + """
+_STEP1_SYSTEM = "\n\n".join([
+    DUTCH_VOICE,
+    "## Copywriting Frameworks Reference\n\n" + _FRAMEWORKS_MD,
+    """Active framework_mode: winback
 
 You are writing the FIRST win-back email to a churned customer.
+Apply Kern direct response rules: one idea (one new concrete reason to return),
+reader is the hero, no apology, matter-of-fact.
+
 Focus on: what has specifically changed or improved since they left.
 Be concrete — name a real feature or workflow improvement.
 Do NOT be apologetic. Do NOT offer discounts in this email.
-Max 4 sentences. Output body only.
-"""
+Max 4 sentences. Output body only.""",
+])
 
-_STEP2_SYSTEM = DUTCH_VOICE + """
+_STEP2_SYSTEM = "\n\n".join([
+    DUTCH_VOICE,
+    "## Copywriting Frameworks Reference\n\n" + _FRAMEWORKS_MD,
+    """Active framework_mode: winback
 
 You are writing a FOLLOW-UP win-back email (second touch, 7 days after the first).
+Apply Kern direct response rules: one idea, last touch, no apology.
 They haven't responded. This is the last touch.
 Give them ONE new, specific reason to come back that wasn't in the first email.
 End with a clear, low-friction ask (reply "interested" or book a 15-min call).
-Max 3 sentences. Output body only.
-"""
+Max 3 sentences. Output body only.""",
+])
 
 _SUBJECT_SYSTEM = "Write a concise email subject line only — no quotes, max 8 words. No clickbait."
 

@@ -8,6 +8,8 @@ from agents._base import BaseAgent, AgentConfig
 from shared.logger import get_logger
 from shared.types import Task, TaskResult
 
+from .copy_generator import generate_copy, framework_mode_for_position
+
 logger = get_logger(__name__)
 
 
@@ -31,18 +33,18 @@ class MarketingAgent(BaseAgent):
         return True
 
     def _generate_copy(self, payload: dict[str, Any]) -> dict[str, Any]:
-        brief = payload.get("brief", "")
         tone = payload.get("tone", self.get_config("default_tone") or "direct-response")
-        fmt = payload.get("format", "short-form ad")
-        system = (
-            self.config.llm_system_prompt
-            or "You are a direct-response copywriter. Use Hook-Story-Offer structure."
+        position = int(payload.get("sequence_position", 1))
+        mode = payload.get("framework_mode") or framework_mode_for_position(position)
+        output = generate_copy(
+            target_persona=payload.get("target_persona", ""),
+            product=payload.get("product", ""),
+            goal=payload.get("goal", payload.get("brief", "")),
+            tone=tone,
+            sequence_position=position,
+            framework_mode=mode,
         )
-        copy = self.ask_llm(
-            f"Write {fmt} copy in a {tone} tone.\n\nBrief: {brief}",
-            system_prompt=system,
-        )
-        return {"copy": copy, "tone": tone, "format": fmt}
+        return dict(output)
 
     def _build_sequence(self, payload: dict[str, Any]) -> dict[str, Any]:
         goal = payload.get("goal", "")

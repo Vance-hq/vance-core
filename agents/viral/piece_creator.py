@@ -12,12 +12,17 @@ Platform formats:
 
 from __future__ import annotations
 
+import pathlib
 from typing import Any
 
 from shared.llm.client import llm
 from shared.logger import get_logger
 
 from .db import ViralDB
+
+_FRAMEWORKS_MD = (
+    pathlib.Path(__file__).parent.parent / "marketing" / "prompts" / "frameworks.md"
+).read_text()
 
 logger = get_logger(__name__)
 
@@ -98,7 +103,12 @@ class PieceCreator:
         platform: str,
         opportunity_window_hours: int,
     ) -> dict[str, Any]:
-        system = _SYSTEM_MAP.get(platform, _TWITTER_SYSTEM)
+        base_system = _SYSTEM_MAP.get(platform, _TWITTER_SYSTEM)
+        system = (
+            base_system
+            + "\n\n## Copywriting Frameworks Reference\n\n" + _FRAMEWORKS_MD
+            + "\n\nActive framework_mode: viral"
+        )
         fmt = _FORMAT_MAP.get(platform, "thread")
 
         raw = llm.complete(
@@ -113,7 +123,7 @@ class PieceCreator:
             }],
             system=system,
             max_tokens=600,
-            metadata={"caller": f"viral.piece_creator.{platform}"},
+            metadata={"caller": f"viral.piece_creator.{platform}", "framework_mode": "viral"},
         ).content[0].text.strip()
 
         hook = self._extract_section(raw, "HOOK")

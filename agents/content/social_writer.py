@@ -9,12 +9,17 @@ Formats:
 
 from __future__ import annotations
 
+import pathlib
 from typing import Any
 
 from shared.llm.client import llm
 from shared.logger import get_logger
 
 from .db import ContentDB
+
+_FRAMEWORKS_MD = (
+    pathlib.Path(__file__).parent.parent / "marketing" / "prompts" / "frameworks.md"
+).read_text()
 
 logger = get_logger(__name__)
 
@@ -107,12 +112,16 @@ class SocialWriter:
     # ------------------------------------------------------------------
 
     def _generate(self, platform: str, product: str, topic: str) -> str:
-        systems = {
+        base_systems = {
             "linkedin": _LINKEDIN_SYSTEM,
             "twitter": _TWITTER_SYSTEM,
             "facebook": _FACEBOOK_SYSTEM,
         }
-        system = systems[platform]
+        system = (
+            base_systems[platform]
+            + "\n\n## Copywriting Frameworks Reference\n\n" + _FRAMEWORKS_MD
+            + "\n\nActive framework_mode: viral"
+        )
         prompt = (
             f"Product: {product}\n"
             f"Topic: {topic}\n\n"
@@ -122,7 +131,7 @@ class SocialWriter:
             messages=[{"role": "user", "content": prompt}],
             system=system,
             max_tokens=800,
-            metadata={"caller": f"content.social_writer.{platform}"},
+            metadata={"caller": f"content.social_writer.{platform}", "framework_mode": "viral"},
         ).content[0].text.strip()
 
     def _trim_to_limits(self, text: str, platform: str) -> str:

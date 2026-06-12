@@ -20,9 +20,15 @@ from typing import TYPE_CHECKING, Any
 
 import redis
 
+import pathlib
+
 from shared.config.settings import settings
 from shared.llm.client import llm
 from shared.logger import get_logger
+
+_FRAMEWORKS_MD = (
+    pathlib.Path(__file__).parent.parent / "marketing" / "prompts" / "frameworks.md"
+).read_text()
 
 if TYPE_CHECKING:
     from .db import ForgeDB
@@ -32,6 +38,13 @@ logger = get_logger(__name__)
 _PIXEL_HTML = '<img src="{pixel_url}" width="1" height="1" alt="" style="display:none"/>'
 
 _HOOK_PROMPT = """
+Active framework_mode: {framework_mode}
+
+Refer to the Framework Selection Logic table:
+- cold_outreach (steps 1-2): Brunson Hook only — curiosity, no offer, peer-to-peer
+- sequence_early (steps 3-4): Brunson Soap Opera #2-#3 — open loop, social proof
+- sequence_offer (steps 5+): Hormozi Grand Slam — benefit subject, urgency, one CTA
+
 You are a cold email personalization expert. Given the research brief below, write ONE
 specific, concrete hook sentence (max 20 words) that opens a cold email to this prospect.
 
@@ -40,6 +53,7 @@ The hook must:
 - Create a natural transition into the value prop
 - Sound like it was written by a human who did their research
 - NOT mention AI, automation software, or our product name
+- Apply the Brunson Hook principle: create a curiosity gap, do not reveal the answer
 
 Research brief:
 {research_notes}
@@ -116,7 +130,7 @@ class SequenceLauncher:
         sequence_id: str,
         sender: dict[str, str],
     ) -> str:
-        hook = self._generate_hook(lead)
+        hook = self._generate_hook(lead, step_number=step.get("step", 1))
         subject = self._personalize(step.get("subject", ""), lead, hook)
         body_html = self._personalize(step.get("body_html", ""), lead, hook)
         body_text = self._personalize(step.get("body_text", ""), lead, hook)
@@ -156,12 +170,19 @@ class SequenceLauncher:
         self._db.update_lead_status(str(lead["id"]), "CONTACTED")
         return send_id
 
-    def _generate_hook(self, lead: dict[str, Any]) -> str:
+    def _generate_hook(self, lead: dict[str, Any], step_number: int = 1) -> str:
         research = lead.get("research_notes") or ""
         if not research:
             return ""
+        if step_number <= 2:
+            framework_mode = "cold_outreach"
+        elif step_number <= 4:
+            framework_mode = "sequence_early"
+        else:
+            framework_mode = "sequence_offer"
         try:
             prompt = _HOOK_PROMPT.format(
+                framework_mode=framework_mode,
                 research_notes=research[:800],
                 company=lead.get("company", ""),
                 title=lead.get("title", ""),
@@ -169,8 +190,9 @@ class SequenceLauncher:
             )
             return llm.complete(
                 messages=[{"role": "user", "content": prompt}],
+                system=_FRAMEWORKS_MD,
                 max_tokens=60,
-                metadata={"caller": "forge.sequence.hook"},
+                metadata={"caller": "forge.sequence.hook", "framework_mode": framework_mode},
             ).content[0].text.strip()
         except Exception as exc:
             logger.debug("hook_generation_failed", error=str(exc))

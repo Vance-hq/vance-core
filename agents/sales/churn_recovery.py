@@ -15,25 +15,37 @@ from __future__ import annotations
 from datetime import datetime, timedelta, timezone
 from typing import Any
 
+import pathlib
+
 from agents.integrations.connectors.stripe import StripeConnector
 from shared.llm.client import llm
 from shared.logger import get_logger
+
+_FRAMEWORKS_MD = (
+    pathlib.Path(__file__).parent.parent / "marketing" / "prompts" / "frameworks.md"
+).read_text()
 
 from .db import SalesDB
 from .mailer import SalesMailer, DUTCH_VOICE
 
 logger = get_logger(__name__)
 
-_RECOVERY_SYSTEM = DUTCH_VOICE + """
+_RECOVERY_SYSTEM = "\n\n".join([
+    DUTCH_VOICE,
+    "## Copywriting Frameworks Reference\n\n" + _FRAMEWORKS_MD,
+    """Active framework_mode: reengagement
 
-You are writing a churn recovery email. Additional rules:
+You are writing a churn recovery email. Apply Kern direct response rules: one idea
+(come back), reader is the hero, no features, acknowledge the gap honestly.
+
+Additional rules:
 - This is NOT a save-the-deal pitch. It is a genuine human ask.
 - Lead with something specific about how they actually used the product.
 - The only offer: a 30-day free extension so they can take another look.
 - The only ask: tell me what broke. One sentence. That's it.
 - Do NOT mention competitors. Do NOT list features. Do NOT use bullet points.
-- Max 5 sentences total. Output body only, no subject line.
-"""
+- Max 5 sentences total. Output body only, no subject line.""",
+])
 
 _SUBJECT_SYSTEM = "Write a concise email subject line only — no quotes, max 8 words. Plain, not clickbait."
 
