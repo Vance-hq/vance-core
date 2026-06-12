@@ -1,0 +1,97 @@
+enabled: true
+poll_interval_seconds: 5.0
+max_retries: 3
+
+llm_system_prompt: >
+  You are an SEO specialist focused on local search and small business visibility.
+  Be specific and actionable. No vague advice. Every recommendation must be
+  something that can be done today and measured next week.
+
+custom:
+  # API credentials
+  google_my_business_credentials: "/secrets/gmb_creds.json"
+  google_search_console_credentials: "/secrets/gsc_creds.json"
+  serp_api_key: ""
+  yext_api_key: ""
+
+  # Alert channel for rank drops
+  alert_channel: "#seo-alerts"
+  rank_drop_threshold: 3
+
+  # Businesses with GBP profiles
+  businesses:
+    trusted_plumbing:
+      name: "Trusted Plumbing"
+      address: "123 Main St, Austin TX 78701"
+      phone: "(512) 555-0100"
+      gbp_location_id: ""
+      website: "https://trustedplumbing.com"
+
+    localoutrank_demo:
+      name: "LocalOutRank Demo"
+      address: "456 Tech Blvd, Austin TX 78702"
+      phone: "(512) 555-0200"
+      gbp_location_id: ""
+      website: "https://localoutrank.com"
+
+  # Products with CMS and domain config
+  products:
+    localoutrank:
+      domain: "localoutrank.com"
+      cms: "wordpress"
+      wordpress_url: "https://localoutrank.com"
+      wordpress_user: "admin"
+      wordpress_app_password: ""
+
+    starpio:
+      domain: "starpio.com"
+      cms: "wordpress"
+      wordpress_url: "https://starpio.com"
+      wordpress_user: "admin"
+      wordpress_app_password: ""
+
+    oneserv:
+      domain: "oneserv.com"
+      cms: "wordpress"
+      wordpress_url: "https://oneserv.com"
+      wordpress_user: "admin"
+      wordpress_app_password: ""
+
+    trusted_plumbing:
+      domain: "trustedplumbing.com"
+      cms: "markdown"
+      repo_path: ""
+
+  # Weekly rank tracking keywords per product
+  tracked_keywords:
+    localoutrank:
+      - "local SEO software"
+      - "google business profile optimization tool"
+      - "rank on google maps"
+      - "local citation management"
+      - "local SEO audit tool"
+    starpio:
+      - "google review management software"
+      - "restaurant review management"
+      - "respond to google reviews"
+    oneserv:
+      - "field service management software small business"
+      - "HVAC dispatch software"
+      - "plumbing job management app"
+    trusted_plumbing:
+      - "plumber Austin TX"
+      - "emergency plumber Austin"
+      - "water heater installation Austin"
+
+  # Citation sources to audit for NAP consistency
+  citation_sources:
+    - yelp.com
+    - yellowpages.com
+    - angi.com
+    - bbb.org
+    - houzz.com
+    - thumbtack.com
+    - homeadvisor.com
+    - google.com
+    - facebook.com
+    - nextdoor.com
