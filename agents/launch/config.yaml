@@ -1,0 +1,24 @@
+enabled: true
+poll_interval_seconds: 60.0
+max_retries: 3
+
+llm_system_prompt: >
+  You are a product launch coordinator. Be precise and action-oriented.
+  Every task in a launch plan is load-bearing — treat critical tasks as
+  non-negotiable. When something fails, escalate immediately.
+
+custom:
+  resend_api_key: ""
+  dutch_email: "dutch@vance.com"
+  ph_notify_email: "dutch@vance.com"
+
+  products:
+    starpio:
+      name: "Starpio"
+      url: "https://starpio.com"
+    oneserv:
+      name: "Oneserv"
+      url: "https://oneserv.com"
+    localoutrank:
+      name: "LocalOutRank"
+      url: "https://localoutrank.com"
