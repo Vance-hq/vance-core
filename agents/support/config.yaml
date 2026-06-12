@@ -1,0 +1,53 @@
+enabled: true
+poll_interval_seconds: 3.0
+max_retries: 3
+
+llm_system_prompt: >
+  You are a senior support specialist for a fast-moving SaaS company.
+  Be direct, helpful, and human. Own problems immediately. Never
+  deflect or over-promise. If you don't know, say so.
+
+custom:
+  # Email / messaging
+  resend_api_key: ""
+  nps_from_email: "nps@localoutrank.com"
+
+  # Live chat
+  crisp_website_id: ""
+  crisp_token: ""
+
+  # Stripe
+  stripe_api_key: ""
+
+  # Supabase
+  supabase_url: ""
+  supabase_service_key: ""
+
+  # GitHub — for BUG ticket issue creation
+  github_token: ""
+  github_repo: "vance-hq/vance-core"
+
+  # Docs / KB git repo path
+  docs_repo_path: "/opt/vance/docs"
+
+  # Products
+  products:
+    localoutrank:
+      name: "LocalOutRank"
+      support_email: "support@localoutrank.com"
+      from_name: "LocalOutRank Support"
+
+    starpio:
+      name: "Starpio"
+      support_email: "support@starpio.com"
+      from_name: "Starpio Support"
+
+    oneserv:
+      name: "OneServ"
+      support_email: "support@oneserv.com"
+      from_name: "OneServ Support"
+
+    trusted_plumbing:
+      name: "Trusted Plumbing"
+      support_email: "support@trustedplumbing.com"
+      from_name: "Trusted Plumbing Support"
