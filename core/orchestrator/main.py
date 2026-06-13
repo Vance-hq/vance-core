@@ -191,6 +191,72 @@ async def status() -> dict[str, Any]:
     }
 
 
+@app.get("/agents")
+async def list_agents() -> dict[str, Any]:
+    """Return status and last-task for all 25 agents, grouped by domain."""
+    history = _session.get_context()
+    last_task_by_agent: dict[str, dict[str, Any]] = {}
+    for entry in history:
+        agent = entry.get("agent")
+        if agent and agent not in last_task_by_agent:
+            last_task_by_agent[agent] = {
+                "action": entry.get("action"),
+                "at": entry.get("at"),
+                "outcome": entry.get("outcome"),
+            }
+
+    def _agent_info(name: str) -> dict[str, Any]:
+        return {
+            "name": name,
+            "status": "running",
+            "last_task": last_task_by_agent.get(name),
+        }
+
+    return {
+        "timestamp": datetime.utcnow().isoformat(),
+        "domains": {
+            "revenue": [
+                _agent_info("sales"),
+                _agent_info("finance"),
+                _agent_info("analytics"),
+                _agent_info("ads"),
+                _agent_info("forge"),
+            ],
+            "content": [
+                _agent_info("marketing"),
+                _agent_info("content"),
+                _agent_info("viral"),
+                _agent_info("seo"),
+                _agent_info("video"),
+            ],
+            "product": [
+                _agent_info("onboarding"),
+                _agent_info("support"),
+                _agent_info("reviews"),
+                _agent_info("outreach"),
+                _agent_info("research"),
+            ],
+            "infra": [
+                _agent_info("dev"),
+                _agent_info("qa"),
+                _agent_info("deploy"),
+                _agent_info("security"),
+                _agent_info("backup"),
+                _agent_info("scaling"),
+                _agent_info("integrations"),
+                _agent_info("local_rank_grader"),
+            ],
+            "intelligence": [
+                _agent_info("intel"),
+                _agent_info("strategy"),
+                _agent_info("reporting"),
+                _agent_info("memory"),
+                _agent_info("launch"),
+            ],
+        },
+    }
+
+
 @app.post("/reload")
 async def reload_config() -> dict[str, Any]:
     """Hot-reload routing_config.yaml without restarting."""

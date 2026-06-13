@@ -646,6 +646,1402 @@ intents:
       - "show status"
       - "give me a status"
 
+  # ---------------------------------------------------------------------------
+  # SALES
+  # ---------------------------------------------------------------------------
+
+  - agent: sales
+    action: trial_nudge
+    description: Nudge trial users toward conversion
+    priority: HIGH
+    patterns:
+      - "nudge trial user"
+      - "trial follow up"
+      - "prod trial user"
+      - "ping trial user"
+      - "convert trial"
+      - "trial conversion push"
+      - "follow up with trial"
+
+  - agent: sales
+    action: upgrade_nudge
+    description: Push free or trial users to upgrade their plan
+    priority: HIGH
+    patterns:
+      - "nudge upgrade"
+      - "upgrade push"
+      - "upsell"
+      - "push to upgrade"
+      - "prompt upgrade"
+      - "move them to paid"
+      - "send upgrade prompt"
+
+  - agent: sales
+    action: churn_recovery
+    description: Attempt to recover a user about to churn
+    priority: CRITICAL
+    patterns:
+      - "churn recovery"
+      - "recover churned"
+      - "save churned user"
+      - "re-engage churned"
+      - "at risk of churning"
+      - "about to cancel"
+      - "stop the churn"
+
+  - agent: sales
+    action: win_back
+    description: Re-engage lapsed or cancelled users
+    priority: HIGH
+    patterns:
+      - "win back"
+      - "bring back lapsed"
+      - "re-engage lapsed"
+      - "bring back cancelled"
+      - "win back campaign"
+      - "lapsed user outreach"
+      - "reactivate old customer"
+
+  - agent: sales
+    action: referral_trigger
+    description: Trigger a referral ask for high-engagement users
+    priority: NORMAL
+    patterns:
+      - "trigger referral"
+      - "send referral"
+      - "referral campaign"
+      - "ask for referral"
+      - "get referrals"
+      - "referral program push"
+      - "launch referral"
+
+  - agent: sales
+    action: pricing_intel
+    description: Pull competitor pricing intel and summarise
+    priority: NORMAL
+    patterns:
+      - "pricing intel"
+      - "competitor pricing"
+      - "price intelligence"
+      - "check competitor prices"
+      - "pricing research"
+      - "what are competitors charging"
+      - "pricing landscape"
+
+  # ---------------------------------------------------------------------------
+  # REVIEWS
+  # ---------------------------------------------------------------------------
+
+  - agent: reviews
+    action: monitor_reviews
+    description: Poll Google Business Profile and Yelp for new reviews
+    priority: NORMAL
+    patterns:
+      - "check reviews"
+      - "any new reviews"
+      - "review check"
+      - "monitor reviews"
+      - "pull reviews"
+      - "what reviews came in"
+      - "new review alerts"
+
+  - agent: reviews
+    action: respond_to_review
+    description: Draft and post a response to a specific review
+    priority: HIGH
+    patterns:
+      - "respond to review"
+      - "reply to review"
+      - "write review response"
+      - "answer review"
+      - "review reply"
+      - "reply to that review"
+      - "respond to the review"
+
+  - agent: reviews
+    action: flag_fake_review
+    description: Flag a suspected fake or policy-violating review
+    priority: HIGH
+    patterns:
+      - "flag fake review"
+      - "report fake review"
+      - "fake review"
+      - "report this review"
+      - "flag review"
+      - "remove fake review"
+      - "that review is fake"
+
+  - agent: reviews
+    action: reputation_alert
+    description: Check reputation scores and surface any reputation risk
+    priority: NORMAL
+    patterns:
+      - "reputation check"
+      - "brand reputation"
+      - "reputation score"
+      - "reputation alert"
+      - "how's our reputation"
+      - "check reputation"
+      - "reputation report"
+
+  - agent: reviews
+    action: review_request
+    description: Send a post-service review request to a customer
+    priority: NORMAL
+    patterns:
+      - "request review"
+      - "ask for review"
+      - "send review request"
+      - "get more reviews"
+      - "review outreach"
+      - "ask them for a review"
+      - "review request campaign"
+
+  # ---------------------------------------------------------------------------
+  # ADS
+  # ---------------------------------------------------------------------------
+
+  - agent: ads
+    action: monitor_performance
+    description: Check paid ads performance across platforms
+    priority: NORMAL
+    patterns:
+      - "check ads"
+      - "ads performance"
+      - "how are ads doing"
+      - "ads report"
+      - "monitor ads"
+      - "paid ads check"
+      - "how are the paid ads"
+
+  - agent: ads
+    action: rotate_creative
+    description: Swap in fresh ad creatives for fatigued ones
+    priority: NORMAL
+    patterns:
+      - "rotate creative"
+      - "swap creative"
+      - "new creative"
+      - "refresh ad creative"
+      - "change ad images"
+      - "ad creative refresh"
+      - "update the creative"
+
+  - agent: ads
+    action: audience_expand
+    description: Research and activate a new audience segment
+    priority: NORMAL
+    patterns:
+      - "expand audience"
+      - "grow audience"
+      - "new audience segment"
+      - "audience expansion"
+      - "broader targeting"
+      - "add new audience"
+      - "widen audience"
+
+  - agent: ads
+    action: budget_realloc
+    description: Reallocate ad budget based on ROAS performance
+    priority: HIGH
+    patterns:
+      - "reallocate budget"
+      - "move budget"
+      - "shift ad budget"
+      - "budget reallocation"
+      - "rebalance ads budget"
+      - "redistribute budget"
+      - "budget shift"
+
+  - agent: ads
+    action: create_campaign
+    description: Create a new paid ad campaign
+    priority: HIGH
+    patterns:
+      - "create ad campaign"
+      - "new paid campaign"
+      - "launch paid ads"
+      - "new ads campaign"
+      - "start ad campaign"
+      - "run paid campaign"
+
+  # ---------------------------------------------------------------------------
+  # CONTENT
+  # ---------------------------------------------------------------------------
+
+  - agent: content
+    action: write_blog_post
+    description: Write an SEO-optimised long-form blog post
+    priority: NORMAL
+    patterns:
+      - "write blog post"
+      - "blog post"
+      - "write an article"
+      - "create blog"
+      - "draft blog"
+      - "new blog post"
+      - "write a blog"
+
+  - agent: content
+    action: write_social_post
+    description: Write a platform-specific social media post
+    priority: NORMAL
+    patterns:
+      - "write social post"
+      - "social media post"
+      - "write a tweet"
+      - "write linkedin post"
+      - "social content"
+      - "write a post"
+      - "create social post"
+
+  - agent: content
+    action: write_newsletter
+    description: Draft an email newsletter for subscribers
+    priority: NORMAL
+    patterns:
+      - "write newsletter"
+      - "newsletter"
+      - "email newsletter"
+      - "draft newsletter"
+      - "weekly newsletter"
+      - "write the newsletter"
+      - "newsletter this week"
+
+  - agent: content
+    action: update_landing_page
+    description: Rewrite or update landing page conversion copy
+    priority: HIGH
+    patterns:
+      - "update landing page"
+      - "rewrite landing page"
+      - "landing page copy"
+      - "update the lander"
+      - "landing page update"
+      - "redo landing page"
+      - "improve landing page"
+
+  - agent: content
+    action: content_calendar
+    description: Plan and generate a content calendar
+    priority: NORMAL
+    patterns:
+      - "content calendar"
+      - "plan content"
+      - "content schedule"
+      - "content plan"
+      - "plan out content"
+      - "what content should we make"
+      - "build content calendar"
+
+  # ---------------------------------------------------------------------------
+  # VIRAL
+  # ---------------------------------------------------------------------------
+
+  - agent: viral
+    action: trend_monitor
+    description: Scan trending topics across platforms for content opportunities
+    priority: NORMAL
+    patterns:
+      - "check trends"
+      - "what's trending"
+      - "trending topics"
+      - "monitor trends"
+      - "viral trends"
+      - "what's hot right now"
+      - "trend scan"
+
+  - agent: viral
+    action: create_viral_piece
+    description: Create a high-shareability content piece
+    priority: HIGH
+    patterns:
+      - "create viral content"
+      - "viral post"
+      - "make something viral"
+      - "write viral piece"
+      - "create viral piece"
+      - "make viral content"
+      - "high share content"
+
+  - agent: viral
+    action: hook_generator
+    description: Generate scroll-stopping hooks for content
+    priority: NORMAL
+    patterns:
+      - "write hooks"
+      - "generate hooks"
+      - "hook ideas"
+      - "create hooks"
+      - "viral hooks"
+      - "scroll stopper hooks"
+      - "attention grabbing hooks"
+
+  - agent: viral
+    action: remix_winner
+    description: Remix a top-performing piece into new formats
+    priority: NORMAL
+    patterns:
+      - "remix top content"
+      - "repurpose winner"
+      - "remix best post"
+      - "repurpose viral content"
+      - "remix content"
+      - "repurpose best performing"
+      - "turn that into more content"
+
+  - agent: viral
+    action: competitor_content_gap
+    description: Identify content gaps vs top competitors
+    priority: NORMAL
+    patterns:
+      - "content gap analysis"
+      - "competitor content gap"
+      - "what content are they making"
+      - "content gap"
+      - "what are we missing content-wise"
+      - "competitor content"
+      - "content we should make"
+
+  # ---------------------------------------------------------------------------
+  # SEO
+  # ---------------------------------------------------------------------------
+
+  - agent: seo
+    action: keyword_research
+    description: Research target keywords and search intent
+    priority: NORMAL
+    patterns:
+      - "keyword research"
+      - "find keywords"
+      - "what keywords should we target"
+      - "keyword ideas"
+      - "keyword analysis"
+      - "seo keywords"
+      - "what to rank for"
+
+  - agent: seo
+    action: on_page_audit
+    description: Audit a page for on-page SEO issues
+    priority: NORMAL
+    patterns:
+      - "seo audit"
+      - "on page audit"
+      - "page seo check"
+      - "check seo"
+      - "page optimization"
+      - "optimize page seo"
+      - "seo check"
+
+  - agent: seo
+    action: gbp_optimize
+    description: Optimize Google Business Profile for local SEO
+    priority: NORMAL
+    patterns:
+      - "optimize gbp"
+      - "gbp optimization"
+      - "improve google profile"
+      - "local seo"
+      - "optimize listing"
+      - "optimize google business"
+      - "gbp seo"
+
+  - agent: seo
+    action: schema_markup
+    description: Generate and inject JSON-LD schema markup
+    priority: NORMAL
+    patterns:
+      - "add schema"
+      - "schema markup"
+      - "structured data"
+      - "json-ld"
+      - "add structured data"
+      - "schema injection"
+      - "seo schema"
+
+  - agent: seo
+    action: citation_audit
+    description: Audit local citation consistency across directories
+    priority: NORMAL
+    patterns:
+      - "citation audit"
+      - "check citations"
+      - "local citations"
+      - "nap audit"
+      - "citation check"
+      - "citation consistency"
+      - "local directory audit"
+
+  - agent: seo
+    action: rank_tracker
+    description: Track keyword ranking positions
+    priority: NORMAL
+    patterns:
+      - "check rankings"
+      - "track rankings"
+      - "what's our ranking"
+      - "keyword positions"
+      - "rank tracking"
+      - "seo rankings"
+      - "where do we rank"
+
+  # ---------------------------------------------------------------------------
+  # SUPPORT
+  # ---------------------------------------------------------------------------
+
+  - agent: support
+    action: handle_ticket
+    description: Classify and draft a response to a support ticket
+    priority: HIGH
+    patterns:
+      - "handle ticket"
+      - "support ticket"
+      - "respond to support"
+      - "answer ticket"
+      - "customer ticket"
+      - "deal with ticket"
+      - "reply to support ticket"
+
+  - agent: support
+    action: resolve_auto
+    description: Auto-resolve common repetitive support tickets
+    priority: NORMAL
+    patterns:
+      - "auto resolve"
+      - "auto-resolve ticket"
+      - "resolve automatically"
+      - "auto close ticket"
+      - "auto handle tickets"
+      - "automate support"
+      - "self service resolve"
+
+  - agent: support
+    action: kb_update
+    description: Update the knowledge base with new info
+    priority: NORMAL
+    patterns:
+      - "update knowledge base"
+      - "update kb"
+      - "add to knowledge base"
+      - "kb update"
+      - "update help docs"
+      - "knowledge base update"
+      - "add kb article"
+
+  - agent: support
+    action: proactive_support
+    description: Identify and reach out to struggling users proactively
+    priority: NORMAL
+    patterns:
+      - "proactive support"
+      - "check for struggling users"
+      - "at-risk users"
+      - "support outreach"
+      - "find struggling users"
+      - "users who need help"
+      - "proactive check in"
+
+  - agent: support
+    action: nps_survey
+    description: Send an NPS or satisfaction survey
+    priority: NORMAL
+    patterns:
+      - "nps survey"
+      - "send nps"
+      - "satisfaction survey"
+      - "net promoter score"
+      - "customer satisfaction"
+      - "nps check"
+      - "survey customers"
+
+  # ---------------------------------------------------------------------------
+  # QA
+  # ---------------------------------------------------------------------------
+
+  - agent: qa
+    action: run_regression_suite
+    description: Run the full regression test suite
+    priority: HIGH
+    patterns:
+      - "run tests"
+      - "run regression"
+      - "test suite"
+      - "regression tests"
+      - "run qa"
+      - "run test suite"
+      - "full test run"
+
+  - agent: qa
+    action: write_tests
+    description: Generate test cases for new features
+    priority: NORMAL
+    patterns:
+      - "write tests"
+      - "generate tests"
+      - "create test cases"
+      - "add tests"
+      - "test generation"
+      - "test coverage"
+      - "write unit tests"
+
+  - agent: qa
+    action: bug_triage
+    description: Triage and prioritise open bug reports
+    priority: HIGH
+    patterns:
+      - "triage bugs"
+      - "bug triage"
+      - "review bugs"
+      - "sort bugs"
+      - "prioritize bugs"
+      - "bug review"
+      - "what bugs to fix first"
+
+  - agent: qa
+    action: load_test
+    description: Run a load or stress test
+    priority: NORMAL
+    patterns:
+      - "load test"
+      - "stress test"
+      - "performance test"
+      - "test under load"
+      - "load testing"
+      - "stress the system"
+      - "load testing run"
+
+  - agent: qa
+    action: coverage_report
+    description: Generate a test coverage report
+    priority: NORMAL
+    patterns:
+      - "coverage report"
+      - "code coverage"
+      - "test coverage report"
+      - "coverage check"
+      - "how much is covered"
+      - "coverage numbers"
+      - "coverage stats"
+
+  # ---------------------------------------------------------------------------
+  # BACKUP
+  # ---------------------------------------------------------------------------
+
+  - agent: backup
+    action: backup_postgres
+    description: Snapshot the Postgres database
+    priority: HIGH
+    patterns:
+      - "backup database"
+      - "backup db"
+      - "postgres backup"
+      - "database backup"
+      - "db snapshot"
+      - "take a db backup"
+      - "snapshot the database"
+
+  - agent: backup
+    action: backup_files
+    description: Sync files and assets to backup storage
+    priority: NORMAL
+    patterns:
+      - "backup files"
+      - "file backup"
+      - "back up files"
+      - "sync backup"
+      - "backup storage"
+      - "file sync backup"
+      - "backup assets"
+
+  - agent: backup
+    action: verify_restore
+    description: Verify backup integrity with a test restore
+    priority: HIGH
+    patterns:
+      - "verify backup"
+      - "test restore"
+      - "check backup"
+      - "restore test"
+      - "backup verification"
+      - "is the backup good"
+      - "test the backup"
+
+  - agent: backup
+    action: mailcow_backup
+    description: Backup the Mailcow email server
+    priority: NORMAL
+    patterns:
+      - "backup email"
+      - "mailcow backup"
+      - "backup mail server"
+      - "email server backup"
+      - "mailcow snapshot"
+      - "email backup"
+      - "mail backup"
+
+  # ---------------------------------------------------------------------------
+  # DEPLOY
+  # ---------------------------------------------------------------------------
+
+  - agent: deploy
+    action: ci_pipeline
+    description: Trigger or check the CI pipeline
+    priority: HIGH
+    patterns:
+      - "run ci"
+      - "ci pipeline"
+      - "trigger ci"
+      - "run pipeline"
+      - "check ci"
+      - "pipeline status"
+      - "ci status"
+
+  - agent: deploy
+    action: promote_to_production
+    description: Promote a staging build to production
+    priority: CRITICAL
+    patterns:
+      - "promote to production"
+      - "promote to prod"
+      - "push to production"
+      - "go to production"
+      - "production deploy"
+      - "promote staging"
+      - "cut a release"
+
+  - agent: deploy
+    action: rollback
+    description: Roll back the most recent production deployment
+    priority: CRITICAL
+    patterns:
+      - "rollback deploy"
+      - "revert deployment"
+      - "deployment rollback"
+      - "undo production deploy"
+      - "roll it back"
+      - "revert to last deploy"
+      - "emergency rollback"
+
+  - agent: deploy
+    action: environment_sync
+    description: Sync environment variables across environments
+    priority: HIGH
+    patterns:
+      - "sync env"
+      - "sync environment"
+      - "update env vars"
+      - "environment variables"
+      - "env sync"
+      - "push env vars"
+      - "sync the env"
+
+  - agent: deploy
+    action: release_notes
+    description: Generate release notes from recent commits
+    priority: NORMAL
+    patterns:
+      - "write release notes"
+      - "generate release notes"
+      - "changelog"
+      - "what changed"
+      - "release notes"
+      - "what's in this release"
+      - "release summary"
+
+  # ---------------------------------------------------------------------------
+  # SCALING
+  # ---------------------------------------------------------------------------
+
+  - agent: scaling
+    action: resource_monitor
+    description: Check VPS CPU, memory, and disk usage
+    priority: HIGH
+    patterns:
+      - "check resources"
+      - "resource usage"
+      - "monitor resources"
+      - "server resources"
+      - "cpu and memory"
+      - "how is the server doing"
+      - "server load"
+
+  - agent: scaling
+    action: alert_threshold
+    description: Configure or review resource alert thresholds
+    priority: NORMAL
+    patterns:
+      - "set alert threshold"
+      - "threshold alert"
+      - "alert threshold"
+      - "resource alert"
+      - "configure alerts"
+      - "alert settings"
+      - "threshold settings"
+
+  - agent: scaling
+    action: auto_remediate
+    description: Automatically remediate a resource issue
+    priority: CRITICAL
+    patterns:
+      - "auto remediate"
+      - "fix resource issue"
+      - "auto scale"
+      - "remediate issue"
+      - "auto fix server"
+      - "remediate the server"
+      - "fix the memory issue"
+
+  - agent: scaling
+    action: capacity_plan
+    description: Forecast capacity needs based on growth trajectory
+    priority: NORMAL
+    patterns:
+      - "capacity planning"
+      - "plan capacity"
+      - "scale planning"
+      - "capacity forecast"
+      - "resource forecast"
+      - "when do we need more servers"
+      - "capacity analysis"
+
+  # ---------------------------------------------------------------------------
+  # FINANCE
+  # ---------------------------------------------------------------------------
+
+  - agent: finance
+    action: mrr_snapshot
+    description: Pull the current MRR breakdown across products
+    priority: HIGH
+    patterns:
+      - "mrr snapshot"
+      - "monthly revenue"
+      - "show mrr today"
+      - "revenue this month"
+      - "finance mrr"
+      - "current mrr"
+      - "what's our monthly revenue"
+
+  - agent: finance
+    action: cost_tracking
+    description: Review monthly operational expenses and burn rate
+    priority: NORMAL
+    patterns:
+      - "track costs"
+      - "what are we spending"
+      - "expenses"
+      - "cost report"
+      - "monthly costs"
+      - "burn rate"
+      - "how much are we spending"
+
+  - agent: finance
+    action: revenue_forecast
+    description: Generate a forward-looking revenue forecast
+    priority: NORMAL
+    patterns:
+      - "revenue forecast"
+      - "forecast revenue"
+      - "projected revenue"
+      - "revenue projection"
+      - "growth forecast"
+      - "what's our revenue trajectory"
+      - "revenue estimate"
+
+  - agent: finance
+    action: anomaly_detect
+    description: Flag unusual spending or revenue anomalies
+    priority: HIGH
+    patterns:
+      - "revenue anomaly"
+      - "detect anomaly"
+      - "unusual spending"
+      - "cost spike"
+      - "flag anomaly"
+      - "something looks off with revenue"
+      - "finance anomaly"
+
+  - agent: finance
+    action: unit_economics
+    description: Calculate LTV, CAC, and payback period
+    priority: NORMAL
+    patterns:
+      - "unit economics"
+      - "ltv cac"
+      - "customer lifetime value"
+      - "cac ratio"
+      - "ltv to cac"
+      - "payback period"
+      - "what's our ltv"
+
+  # ---------------------------------------------------------------------------
+  # ONBOARDING
+  # ---------------------------------------------------------------------------
+
+  - agent: onboarding
+    action: new_signup_flow
+    description: Trigger the onboarding flow for a new signup
+    priority: HIGH
+    patterns:
+      - "new signup"
+      - "onboard new user"
+      - "welcome new user"
+      - "start onboarding"
+      - "new user flow"
+      - "trigger onboarding"
+      - "new customer onboarding"
+
+  - agent: onboarding
+    action: activation_nudge
+    description: Nudge a user toward their first activation moment
+    priority: HIGH
+    patterns:
+      - "activation nudge"
+      - "nudge activation"
+      - "push to activate"
+      - "first value nudge"
+      - "activation push"
+      - "get them to activate"
+      - "push them to first action"
+
+  - agent: onboarding
+    action: first_value_moment
+    description: Trigger actions to get user to their aha moment
+    priority: HIGH
+    patterns:
+      - "first value moment"
+      - "aha moment"
+      - "first win"
+      - "activation event"
+      - "key moment"
+      - "first success"
+      - "first value"
+
+  - agent: onboarding
+    action: stuck_user_alert
+    description: Alert on users who are stuck or stalling in onboarding
+    priority: HIGH
+    patterns:
+      - "stuck user"
+      - "at risk user"
+      - "user not activating"
+      - "stalled user"
+      - "inactive new user"
+      - "stuck in onboarding"
+      - "user dropped off"
+
+  - agent: onboarding
+    action: onboarding_audit
+    description: Audit the onboarding funnel for drop-off points
+    priority: NORMAL
+    patterns:
+      - "onboarding audit"
+      - "review onboarding"
+      - "check onboarding flow"
+      - "audit onboarding"
+      - "how's onboarding"
+      - "onboarding drop off"
+      - "onboarding funnel"
+
+  # ---------------------------------------------------------------------------
+  # RESEARCH
+  # ---------------------------------------------------------------------------
+
+  - agent: research
+    action: competitor_monitor
+    description: Deep-dive competitor analysis
+    priority: NORMAL
+    patterns:
+      - "competitor research"
+      - "research competitors"
+      - "competitor analysis"
+      - "deep competitor analysis"
+      - "competitive research"
+      - "what are competitors doing"
+      - "competitor deep dive"
+
+  - agent: research
+    action: market_signal_scan
+    description: Scan for market signals and shifts
+    priority: NORMAL
+    patterns:
+      - "market research"
+      - "scan market"
+      - "market signals"
+      - "market analysis"
+      - "market conditions"
+      - "what's the market doing"
+      - "research the market"
+
+  - agent: research
+    action: customer_sentiment
+    description: Analyze customer sentiment from reviews and feedback
+    priority: NORMAL
+    patterns:
+      - "customer sentiment"
+      - "what customers say"
+      - "sentiment analysis"
+      - "user feedback analysis"
+      - "how do customers feel"
+      - "customer opinions"
+      - "sentiment report"
+
+  - agent: research
+    action: feature_gap_analysis
+    description: Identify product feature gaps vs competitors
+    priority: NORMAL
+    patterns:
+      - "feature gap"
+      - "feature gap analysis"
+      - "what features are we missing"
+      - "gap analysis"
+      - "competitor features"
+      - "what should we build"
+      - "feature comparison"
+
+  - agent: research
+    action: pricing_research
+    description: Research competitor pricing models and strategy
+    priority: NORMAL
+    patterns:
+      - "pricing strategy research"
+      - "research pricing"
+      - "price comparison"
+      - "pricing model research"
+      - "how are they pricing"
+      - "pricing benchmark"
+      - "pricing study"
+
+  # ---------------------------------------------------------------------------
+  # LAUNCH
+  # ---------------------------------------------------------------------------
+
+  - agent: launch
+    action: plan_launch
+    description: Create a detailed product launch plan
+    priority: HIGH
+    patterns:
+      - "plan launch"
+      - "launch plan"
+      - "product launch plan"
+      - "launch strategy"
+      - "plan the launch"
+      - "build launch plan"
+      - "create a launch plan"
+
+  - agent: launch
+    action: execute_launch
+    description: Execute the coordinated product launch sequence
+    priority: CRITICAL
+    patterns:
+      - "execute launch"
+      - "run the launch"
+      - "do the launch"
+      - "launch now"
+      - "go live with launch"
+      - "kick off launch"
+      - "fire the launch"
+
+  - agent: launch
+    action: product_hunt_launch
+    description: Coordinate a Product Hunt launch
+    priority: HIGH
+    patterns:
+      - "product hunt launch"
+      - "launch on product hunt"
+      - "ph launch"
+      - "launch to product hunt"
+      - "product hunt"
+      - "submit to product hunt"
+      - "ph submission"
+
+  - agent: launch
+    action: launch_debrief
+    description: Run a post-launch review and capture lessons
+    priority: NORMAL
+    patterns:
+      - "launch debrief"
+      - "post launch review"
+      - "how did the launch go"
+      - "launch results"
+      - "debrief launch"
+      - "launch recap"
+      - "launch post-mortem"
+
+  # ---------------------------------------------------------------------------
+  # REPORTING
+  # ---------------------------------------------------------------------------
+
+  - agent: reporting
+    action: daily_brief
+    description: Compile and deliver the daily business briefing
+    priority: HIGH
+    patterns:
+      - "daily brief"
+      - "morning brief"
+      - "daily report"
+      - "brief me"
+      - "what happened today"
+      - "daily update"
+      - "morning update"
+
+  - agent: reporting
+    action: weekly_summary
+    description: Generate the weekly performance summary
+    priority: HIGH
+    patterns:
+      - "weekly summary"
+      - "week in review"
+      - "weekly report"
+      - "week recap"
+      - "weekly wrap up"
+      - "how did the week go"
+      - "weekly digest"
+
+  - agent: reporting
+    action: alert_deliver
+    description: Deliver a priority alert to Dutch immediately
+    priority: CRITICAL
+    patterns:
+      - "deliver alert"
+      - "send priority alert"
+      - "push alert"
+      - "fire alert"
+      - "urgent alert"
+      - "critical alert"
+      - "emergency notification"
+
+  - agent: reporting
+    action: on_demand_report
+    description: Generate an on-demand report for a specific topic or product
+    priority: NORMAL
+    patterns:
+      - "on demand report"
+      - "run a report"
+      - "generate report"
+      - "pull a report"
+      - "quick report"
+      - "report on"
+      - "give me a report on"
+
+  # ---------------------------------------------------------------------------
+  # MEMORY
+  # ---------------------------------------------------------------------------
+
+  - agent: memory
+    action: capture_decision
+    description: Capture and store an important business decision
+    priority: HIGH
+    patterns:
+      - "capture decision"
+      - "save decision"
+      - "log decision"
+      - "remember this decision"
+      - "record decision"
+      - "store this decision"
+      - "decision log"
+
+  - agent: memory
+    action: retrieve_context
+    description: Retrieve relevant stored context on a topic
+    priority: NORMAL
+    patterns:
+      - "get context"
+      - "pull context"
+      - "what do you know about"
+      - "retrieve context"
+      - "background context"
+      - "what's in memory"
+      - "context on"
+
+  - agent: memory
+    action: forget
+    description: Remove a stored memory or decision
+    priority: NORMAL
+    patterns:
+      - "forget that"
+      - "delete memory"
+      - "remove from memory"
+      - "clear that"
+      - "wipe memory"
+      - "remove that memory"
+      - "delete from memory"
+
+  - agent: memory
+    action: learn_preferences
+    description: Update stored preferences and working style
+    priority: NORMAL
+    patterns:
+      - "update preferences"
+      - "learn preference"
+      - "save preference"
+      - "remember my preference"
+      - "store preference"
+      - "update my prefs"
+      - "set preference"
+
+  - agent: memory
+    action: build_context_brief
+    description: Build a rich context brief from stored memory
+    priority: NORMAL
+    patterns:
+      - "build context brief"
+      - "context brief"
+      - "summarize context"
+      - "build my brief"
+      - "what do you remember"
+      - "memory summary"
+      - "full context"
+
+  # ---------------------------------------------------------------------------
+  # STRATEGY
+  # ---------------------------------------------------------------------------
+
+  - agent: strategy
+    action: synthesize_signals
+    description: Synthesize all agent signals into one strategic insight
+    priority: HIGH
+    patterns:
+      - "synthesize signals"
+      - "analyze signals"
+      - "what do the signals say"
+      - "signal synthesis"
+      - "cross signal analysis"
+      - "what's the big picture"
+      - "strategic signal read"
+
+  - agent: strategy
+    action: recommend_next_action
+    description: Generate the top 3 prioritised strategic recommendations
+    priority: HIGH
+    patterns:
+      - "recommend next action"
+      - "what should we do"
+      - "best next move"
+      - "strategic recommendation"
+      - "recommend next"
+      - "what's the best next step"
+      - "top recommendation"
+
+  - agent: strategy
+    action: product_prioritization
+    description: Score and rank all products by growth potential
+    priority: HIGH
+    patterns:
+      - "prioritize products"
+      - "which product first"
+      - "product priority"
+      - "rank products"
+      - "product scoring"
+      - "product allocation"
+      - "where to focus"
+
+  - agent: strategy
+    action: pivot_detection
+    description: Detect if a product needs a strategic pivot
+    priority: HIGH
+    patterns:
+      - "detect pivot"
+      - "should we pivot"
+      - "pivot check"
+      - "pivot analysis"
+      - "are we failing"
+      - "pivot needed"
+      - "strategy not working"
+
+  - agent: strategy
+    action: opportunity_evaluate
+    description: Score and evaluate a new business opportunity
+    priority: NORMAL
+    patterns:
+      - "evaluate opportunity"
+      - "score opportunity"
+      - "assess this opportunity"
+      - "opportunity check"
+      - "rate this opportunity"
+      - "is this worth pursuing"
+      - "opportunity score"
+
+  # ---------------------------------------------------------------------------
+  # INTEL
+  # ---------------------------------------------------------------------------
+
+  - agent: intel
+    action: scan_industry_news
+    description: Scan industry news for signals and trends
+    priority: NORMAL
+    patterns:
+      - "scan news"
+      - "industry news"
+      - "latest news"
+      - "news scan"
+      - "what's in the news"
+      - "news brief"
+      - "what happened in the industry"
+
+  - agent: intel
+    action: monitor_competitors_social
+    description: Monitor competitor social media activity
+    priority: NORMAL
+    patterns:
+      - "monitor competitor social"
+      - "competitor social"
+      - "watch their social"
+      - "competitor twitter"
+      - "competitor posts"
+      - "what are competitors posting"
+      - "competitor social media"
+
+  - agent: intel
+    action: detect_market_shift
+    description: Detect significant market or industry shifts
+    priority: HIGH
+    patterns:
+      - "market shift"
+      - "detect shift"
+      - "market change"
+      - "industry shift"
+      - "market disruption"
+      - "something shifted in the market"
+      - "major market change"
+
+  - agent: intel
+    action: digest_intel
+    description: Compile and deliver the daily intelligence digest
+    priority: NORMAL
+    patterns:
+      - "intel digest"
+      - "compile intel"
+      - "intel summary"
+      - "daily intel"
+      - "intel report"
+      - "intelligence report"
+      - "what's the intel"
+
+  - agent: intel
+    action: competitor_activity_watch
+    description: Deep watch on a specific competitor's moves
+    priority: HIGH
+    patterns:
+      - "competitor activity"
+      - "watch competitor"
+      - "what are competitors doing"
+      - "competitor moves"
+      - "competitor watch"
+      - "competitor monitoring"
+      - "track competitor"
+
+  - agent: intel
+    action: press_monitoring
+    description: Monitor press and media mentions
+    priority: NORMAL
+    patterns:
+      - "press monitoring"
+      - "monitor press"
+      - "media mentions"
+      - "news mentions"
+      - "brand in the news"
+      - "press coverage"
+      - "brand press"
+
+  - agent: intel
+    action: community_listen
+    description: Listen to communities on Reddit and forums for signals
+    priority: NORMAL
+    patterns:
+      - "community listen"
+      - "reddit monitoring"
+      - "forum monitoring"
+      - "community monitoring"
+      - "listen to community"
+      - "what are people saying online"
+      - "community signals"
+
+  - agent: intel
+    action: opportunity_scan
+    description: Scan for strategic market opportunities
+    priority: NORMAL
+    patterns:
+      - "scan opportunities"
+      - "opportunity scan"
+      - "find opportunities"
+      - "market opportunities"
+      - "opportunity finder"
+      - "what opportunities are out there"
+      - "opportunity sweep"
+
+  - agent: intel
+    action: track_keyword
+    description: Track a specific keyword or topic over time
+    priority: NORMAL
+    patterns:
+      - "track keyword"
+      - "monitor keyword"
+      - "keyword tracking"
+      - "watch keyword"
+      - "keyword monitor"
+      - "track this term"
+      - "follow this keyword"
+
+  # ---------------------------------------------------------------------------
+  # VIDEO
+  # ---------------------------------------------------------------------------
+
+  - agent: video
+    action: create_script
+    description: Write a script for a YouTube or social video
+    priority: NORMAL
+    patterns:
+      - "write video script"
+      - "video script"
+      - "create script"
+      - "script for video"
+      - "script a video"
+      - "write a script"
+      - "youtube script"
+
+  - agent: video
+    action: create_shorts
+    description: Create a short-form video concept and script
+    priority: NORMAL
+    patterns:
+      - "create shorts"
+      - "make shorts"
+      - "youtube shorts"
+      - "short form video"
+      - "create short video"
+      - "reel script"
+      - "tiktok script"
+
+  - agent: video
+    action: optimize_title
+    description: Generate optimised video titles for CTR
+    priority: NORMAL
+    patterns:
+      - "optimize video title"
+      - "title optimization"
+      - "best title for video"
+      - "youtube title"
+      - "video title ideas"
+      - "write video title"
+      - "title for this video"
+
+  - agent: video
+    action: track_performance
+    description: Track video performance and engagement metrics
+    priority: NORMAL
+    patterns:
+      - "video performance"
+      - "track video"
+      - "how's the video doing"
+      - "video stats"
+      - "video analytics"
+      - "youtube performance"
+      - "video metrics"
+
+  # ---------------------------------------------------------------------------
+  # VANCE SYSTEM — meta-commands
+  # ---------------------------------------------------------------------------
+
   - agent: vance_system
     action: unknown
     description: Fallback when no intent can be determined

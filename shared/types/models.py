@@ -16,6 +16,14 @@ class TaskStatus(str, Enum):
     DEAD = "dead"
 
 
+class Product(str, Enum):
+    STARPIO = "starpio"
+    ONESERV = "oneserv"
+    LOCALOUTRANK = "localoutrank"
+    TRUSTED_PLUMBING = "trusted_plumbing"
+    VANCE_SYSTEM = "vance_system"
+
+
 class AgentCapability(str, Enum):
     MARKETING = "marketing"
     OUTREACH = "outreach"
@@ -54,6 +62,7 @@ class Task:
     payload: dict[str, Any]
     priority: int = 5
     status: TaskStatus = TaskStatus.PENDING
+    product: Product | None = None
     created_at: datetime = field(default_factory=datetime.utcnow)
     completed_at: datetime | None = None
     error: str | None = None
