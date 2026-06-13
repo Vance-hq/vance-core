@@ -1,21 +1,19 @@
 import type { Metadata } from "next";
+import "./globals.css";
+import HealthBar from "./components/HealthBar";
 
 export const metadata: Metadata = {
   title: "Vance HQ",
-  description: "Vance agent status dashboard",
+  description: "Real-time Vance agent control dashboard",
 };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="en">
-      <head>
-        <style>{`
-          *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-          body { font-family: 'SF Mono', 'Fira Code', monospace; background: #0d0d0d; color: #e0e0e0; min-height: 100vh; }
-          a { color: inherit; text-decoration: none; }
-        `}</style>
-      </head>
-      <body>{children}</body>
+    <html lang="en" className="dark">
+      <body className="bg-surface-0 min-h-screen">
+        <HealthBar />
+        <main className="px-4 pb-8 pt-4 max-w-screen-2xl mx-auto">{children}</main>
+      </body>
     </html>
   );
 }
