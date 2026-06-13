@@ -35,9 +35,9 @@ body {
 }
 
 /* SSE event log colors */
-.event-complete  { color: #86efac; }   /* green-300  — readable on dark */
-.event-failed    { color: #fca5a5; }   /* red-300    — softer, higher contrast than red-400 */
-.event-status    { color: #93c5fd; }   /* blue-300   */
-.event-alert     { color: #fdba74; }   /* orange-300 */
-.event-default   { color: #d4d4d8; }   /* zinc-300   — was zinc-400, now clearly legible */
-.event-system    { color: #71717a; }   /* zinc-500   — muted, for infra noise */
+.event-complete  { color: #4ade80; }   /* green-400  — bright green  */
+.event-failed    { color: #f87171; }   /* red-400    — bright red    */
+.event-status    { color: #60a5fa; }   /* blue-400   — bright blue   */
+.event-alert     { color: #fb923c; }   /* orange-400 — bright orange */
+.event-default   { color: #e4e4e7; }   /* zinc-200   — near white    */
+.event-system    { color: #a1a1aa; }   /* zinc-400   — visible muted */

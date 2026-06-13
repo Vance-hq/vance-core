@@ -19,17 +19,17 @@ const CHECKS: { key: keyof HealthStatus; label: string }[] = [
 
 function Indicator({ label, ok }: { label: string; ok: boolean | undefined }) {
   return (
-    <div className="flex items-center gap-1.5 text-xs">
+    <div className="flex items-center gap-2 text-xs font-mono font-semibold">
       <span
-        className={`inline-block w-2 h-2 rounded-full flex-shrink-0 ${
+        className={`inline-block w-2.5 h-2.5 rounded-full flex-shrink-0 ${
           ok === undefined
             ? "bg-zinc-600"
             : ok
-            ? "bg-green-500"
+            ? "bg-green-400"
             : "bg-red-500 animate-pulse"
         }`}
       />
-      <span className={ok === false ? "text-red-400" : "text-zinc-400"}>
+      <span className={ok === false ? "text-red-400" : ok ? "text-zinc-200" : "text-zinc-500"}>
         {label}
       </span>
     </div>
@@ -44,7 +44,6 @@ export default function HealthBar() {
     try {
       const res = await fetch("/api/health");
       const data = (await res.json()) as HealthStatus;
-      // Browser notification for any new failure.
       if (prevRef.current) {
         for (const { key, label } of CHECKS) {
           if (prevRef.current[key] && !data[key]) {
@@ -72,11 +71,11 @@ export default function HealthBar() {
   }, []);
 
   return (
-    <div className="sticky top-0 z-50 flex items-center justify-between px-4 py-2 bg-surface-1 border-b border-zinc-800">
-      <span className="text-xs text-zinc-600 font-mono tracking-widest uppercase">
-        vance hq
+    <div className="sticky top-0 z-50 flex items-center justify-between px-5 py-2.5 bg-zinc-900 border-b border-zinc-700">
+      <span className="text-sm font-mono font-bold tracking-widest text-white uppercase">
+        VANCE HQ
       </span>
-      <div className="flex items-center gap-4">
+      <div className="flex items-center gap-6">
         {CHECKS.map(({ key, label }) => (
           <Indicator
             key={key}
@@ -85,7 +84,7 @@ export default function HealthBar() {
           />
         ))}
         {status && (
-          <span className="text-xs text-zinc-700 pl-2 border-l border-zinc-800">
+          <span className="text-xs text-zinc-500 pl-3 border-l border-zinc-700">
             {new Date(status.checked_at).toLocaleTimeString()}
           </span>
         )}
