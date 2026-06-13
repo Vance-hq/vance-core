@@ -67,3 +67,124 @@ class StrategyDB:
         with get_db() as conn:
             with conn.cursor() as cur:
                 cur.execute("UPDATE strategy_signals SET actioned = TRUE WHERE id = %s", (signal_id,))
+
+    # ------------------------------------------------------------------
+    # strategy_insights table
+    # ------------------------------------------------------------------
+
+    def save_insight(self, insight: str, products_affected: list[str], confidence: float) -> str:
+        with get_db() as conn:
+            with conn.cursor(cursor_factory=psycopg2.extras.RealDictCursor) as cur:
+                cur.execute(
+                    """
+                    INSERT INTO strategy_insights (insight, products_affected, confidence)
+                    VALUES (%s, %s, %s) RETURNING id
+                    """,
+                    (insight, json.dumps(products_affected), confidence),
+                )
+                return str(cur.fetchone()["id"])
+
+    def get_recent_insights(self, limit: int = 10) -> list[dict[str, Any]]:
+        with get_db() as conn:
+            with conn.cursor(cursor_factory=psycopg2.extras.RealDictCursor) as cur:
+                cur.execute(
+                    "SELECT * FROM strategy_insights ORDER BY created_at DESC LIMIT %s",
+                    (limit,),
+                )
+                return [dict(r) for r in cur.fetchall()]
+
+    def mark_insight_actioned(self, insight_id: str) -> None:
+        with get_db() as conn:
+            with conn.cursor() as cur:
+                cur.execute("UPDATE strategy_insights SET actioned = TRUE WHERE id = %s", (insight_id,))
+
+    # ------------------------------------------------------------------
+    # recommendations table
+    # ------------------------------------------------------------------
+
+    def save_recommendation(
+        self,
+        recommendation: str,
+        rationale: str,
+        agent_target: str,
+        confidence: float,
+    ) -> str:
+        with get_db() as conn:
+            with conn.cursor(cursor_factory=psycopg2.extras.RealDictCursor) as cur:
+                cur.execute(
+                    """
+                    INSERT INTO recommendations (recommendation, rationale, agent_target, confidence)
+                    VALUES (%s, %s, %s, %s) RETURNING id
+                    """,
+                    (recommendation, rationale, agent_target, confidence),
+                )
+                return str(cur.fetchone()["id"])
+
+    def mark_recommendation_executed(self, rec_id: str, outcome: str = "") -> None:
+        with get_db() as conn:
+            with conn.cursor() as cur:
+                cur.execute(
+                    "UPDATE recommendations SET executed = TRUE, outcome = %s WHERE id = %s",
+                    (outcome, rec_id),
+                )
+
+    # ------------------------------------------------------------------
+    # pivot_alerts table
+    # ------------------------------------------------------------------
+
+    def save_pivot_alert(
+        self,
+        product: str,
+        diagnosis: str,
+        options: list[dict],
+        recommended_option: str,
+    ) -> str:
+        with get_db() as conn:
+            with conn.cursor(cursor_factory=psycopg2.extras.RealDictCursor) as cur:
+                cur.execute(
+                    """
+                    INSERT INTO pivot_alerts (product, diagnosis, options, recommended_option)
+                    VALUES (%s, %s, %s, %s) RETURNING id
+                    """,
+                    (product, diagnosis, json.dumps(options), recommended_option),
+                )
+                return str(cur.fetchone()["id"])
+
+    # ------------------------------------------------------------------
+    # metrics queries (used by PivotDetector)
+    # ------------------------------------------------------------------
+
+    def get_mrr_trend(self, product: str, weeks: int = 4) -> list[dict[str, Any]]:
+        """Return recent MRR data points from strategy_signals (revenue type)."""
+        with get_db() as conn:
+            with conn.cursor(cursor_factory=psycopg2.extras.RealDictCursor) as cur:
+                cur.execute(
+                    """
+                    SELECT created_at::date AS week, summary, recommendation
+                    FROM strategy_signals
+                    WHERE product = %s AND signal_type IN ('retention', 'market', 'revenue')
+                    ORDER BY created_at DESC LIMIT %s
+                    """,
+                    (product, weeks),
+                )
+                return [dict(r) for r in cur.fetchall()]
+
+    def get_conversion_rate(self, product: str, days: int = 30) -> float:
+        """Return the most recently recorded conversion rate for a product from signals."""
+        with get_db() as conn:
+            with conn.cursor(cursor_factory=psycopg2.extras.RealDictCursor) as cur:
+                cur.execute(
+                    """
+                    SELECT recommendation FROM strategy_signals
+                    WHERE product = %s AND signal_type = 'conversion'
+                    ORDER BY created_at DESC LIMIT 1
+                    """,
+                    (product,),
+                )
+                row = cur.fetchone()
+        if row:
+            try:
+                return float(row["recommendation"])
+            except (ValueError, TypeError):
+                pass
+        return 0.0

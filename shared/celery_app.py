@@ -177,6 +177,23 @@ app.conf.beat_schedule = {
         "task": "agents.ads.tasks.monthly_audience_expand",
         "schedule": 28 * 86_400.0,
     },
+    # Strategy agent
+    "strategy-daily-synthesize": {
+        "task": "agents.strategy.tasks.daily_synthesize_signals",
+        "schedule": 86_400.0,
+    },
+    "strategy-daily-recommend": {
+        "task": "agents.strategy.tasks.daily_recommend_next_action",
+        "schedule": 86_400.0,
+    },
+    "strategy-weekly-prioritization": {
+        "task": "agents.strategy.tasks.weekly_product_prioritization",
+        "schedule": 7 * 86_400.0,
+    },
+    "strategy-weekly-pivot-detection": {
+        "task": "agents.strategy.tasks.weekly_pivot_detection",
+        "schedule": 7 * 86_400.0,
+    },
     # Reporting agent
     "reporting-daily-brief": {
         "task": "agents.reporting.tasks.daily_brief",

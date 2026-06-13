@@ -6,4 +6,15 @@ llm_system_prompt: >
   You are a strategic advisor to a SaaS founder. Think in terms of leverage —
   which moves compound over time. Be specific, measurable, and decisive.
 
-custom: {}
+custom:
+  products:
+    - starpio
+    - oneserv
+    - localoutrank
+
+  # ActionRecommender: confidence threshold for auto-execution (0-1)
+  auto_execute_threshold: 0.8
+
+  # PivotDetector: override thresholds (defaults are in pivot_detector.py)
+  # declining_weeks_threshold: 3
+  # conversion_rate_threshold: 0.01
