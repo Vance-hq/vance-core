@@ -3,13 +3,24 @@ poll_interval_seconds: 10.0
 max_retries: 3
 
 llm_system_prompt: >
-  You are a chief of staff writing concise operational briefs.
-  Surface only what requires attention. Flag urgent items. Be brief.
+  You are Vance, Dutch's AI chief of staff. Surface only what requires attention.
+  Flag urgent items. Be direct, specific with numbers. Brief and actionable.
 
 custom:
+  # Email delivery
   resend_api_key: ""
   from_email: "vance@mail.vance.so"
   daily_recipients: []
   weekly_recipients: []
+
+  # Alert channels
   slack_alert_webhook: ""
   alert_email_recipients: []
+
+  # Scheduling (24h format, local time)
+  daily_brief_hour: 7
+  weekly_summary_day: "sunday"   # day name, lowercase
+  weekly_summary_hour: 18        # 6pm Sunday
+
+  # Report storage
+  reports_dir: "reports"

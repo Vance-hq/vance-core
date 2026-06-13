@@ -73,3 +73,65 @@ class ReportingDB:
                     (from_date, to_date),
                 )
                 return [dict(r) for r in cur.fetchall()]
+
+    # ------------------------------------------------------------------
+    # reports table
+    # ------------------------------------------------------------------
+
+    def save_report(
+        self,
+        report_type: str,
+        content_text: str,
+        period_date: str,
+        product: str | None = None,
+    ) -> str:
+        with get_db() as conn:
+            with conn.cursor(cursor_factory=psycopg2.extras.RealDictCursor) as cur:
+                cur.execute(
+                    """
+                    INSERT INTO reports (report_type, product, content_text, period_date)
+                    VALUES (%s, %s, %s, %s) RETURNING id
+                    """,
+                    (report_type, product, content_text, period_date),
+                )
+                return str(cur.fetchone()["id"])
+
+    def mark_report_delivered(self, report_id: str) -> None:
+        with get_db() as conn:
+            with conn.cursor() as cur:
+                cur.execute(
+                    "UPDATE reports SET delivered_at = NOW() WHERE id = %s",
+                    (report_id,),
+                )
+
+    # ------------------------------------------------------------------
+    # alerts_log table
+    # ------------------------------------------------------------------
+
+    def log_alert(self, source_agent: str, alert_type: str, message: str) -> str:
+        with get_db() as conn:
+            with conn.cursor(cursor_factory=psycopg2.extras.RealDictCursor) as cur:
+                cur.execute(
+                    """
+                    INSERT INTO alerts_log (source_agent, alert_type, message)
+                    VALUES (%s, %s, %s) RETURNING id
+                    """,
+                    (source_agent, alert_type, message),
+                )
+                return str(cur.fetchone()["id"])
+
+    def mark_alert_delivered(self, alert_id: str) -> None:
+        with get_db() as conn:
+            with conn.cursor() as cur:
+                cur.execute(
+                    "UPDATE alerts_log SET delivered_at = NOW() WHERE id = %s",
+                    (alert_id,),
+                )
+
+    def acknowledge_alert(self, alert_id: str) -> None:
+        with get_db() as conn:
+            with conn.cursor() as cur:
+                cur.execute(
+                    "UPDATE alerts_log SET acknowledged_at = NOW() WHERE id = %s",
+                    (alert_id,),
+                )

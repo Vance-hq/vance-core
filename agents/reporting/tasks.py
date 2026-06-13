@@ -1,4 +1,4 @@
-"""Celery tasks for the reporting agent — daily and weekly schedules."""
+"""Celery tasks for the reporting agent."""
 
 from __future__ import annotations
 
@@ -15,7 +15,7 @@ def health_ping() -> None:
 
 @app.task(name="agents.reporting.tasks.daily_brief", ignore_result=True)
 def daily_brief() -> None:
-    """Run daily — compile and send daily brief."""
+    """Run every morning — compile and deliver the daily briefing via voice and email."""
     import uuid
 
     from agents._base import AgentConfig
@@ -35,9 +35,31 @@ def daily_brief() -> None:
         logger.error("daily_brief_task_failed", error=str(exc))
 
 
+@app.task(name="agents.reporting.tasks.weekly_summary", ignore_result=True)
+def weekly_summary() -> None:
+    """Run every Sunday evening — compile week-over-week summary with trend analysis."""
+    import uuid
+
+    from agents._base import AgentConfig
+    from agents.reporting.main import ReportingAgent
+    from shared.types import AgentCapability, Task
+
+    config = AgentConfig.load("reporting")
+    agent = ReportingAgent("reporting", config)
+    task = Task(
+        id=str(uuid.uuid4()),
+        agent=AgentCapability.REPORTING,
+        payload={"action": "weekly_summary"},
+    )
+    try:
+        agent.handle(task)
+    except Exception as exc:
+        logger.error("weekly_summary_task_failed", error=str(exc))
+
+
 @app.task(name="agents.reporting.tasks.weekly_digest", ignore_result=True)
 def weekly_digest() -> None:
-    """Run weekly — compile and send weekly digest."""
+    """Legacy — kept for backward compat. Prefer weekly_summary."""
     import uuid
 
     from agents._base import AgentConfig

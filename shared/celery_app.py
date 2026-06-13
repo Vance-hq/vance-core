@@ -177,4 +177,13 @@ app.conf.beat_schedule = {
         "task": "agents.ads.tasks.monthly_audience_expand",
         "schedule": 28 * 86_400.0,
     },
+    # Reporting agent
+    "reporting-daily-brief": {
+        "task": "agents.reporting.tasks.daily_brief",
+        "schedule": 86_400.0,  # every morning (use crontab for 7 AM in prod)
+    },
+    "reporting-weekly-summary": {
+        "task": "agents.reporting.tasks.weekly_summary",
+        "schedule": 7 * 86_400.0,  # every Sunday evening
+    },
 }
