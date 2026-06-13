@@ -1,17 +1,22 @@
 """
-Memory agent — persistent context store across agent runs using pgvector.
+Memory agent — Vance's long-term brain.
 
-Actions:
+Original actions (5):
   store           — persist a key/value memory with metadata and embedding
   retrieve        — semantic search (or recency fallback) over stored memories
   summarize       — compact old memories for a context key into a summary
-  forget          — delete memories by pattern or expired ones
+  forget          — delete memories by pattern, expired, topic, or product
   list_recent     — list most recent memories for a context key
+
+New actions (4):
+  capture_decision   — record significant decisions + outcomes to decision_log
+  build_context_brief — synthesize a 5-sentence session brief from recent decisions
+  learn_preferences  — infer Dutch's behavioral preferences → write preferences.yaml
+  retrieve_context   — 'what did we do about X' via vector search on decision_log
 """
 
 from __future__ import annotations
 
-import json
 from typing import Any
 
 from agents._base import AgentConfig, BaseAgent
@@ -19,8 +24,12 @@ from shared.llm.client import llm
 from shared.logger import get_logger
 from shared.types import Task, TaskResult
 
+from .context_brief_builder import ContextBriefBuilder
+from .context_retriever import ContextRetriever
 from .db import MemoryDB
+from .decision_capturer import DecisionCapturer
 from .embedder import embed
+from .preference_learner import PreferenceLearner
 
 logger = get_logger(__name__)
 
@@ -35,18 +44,29 @@ class MemoryAgent(BaseAgent):
 
     def __init__(self, agent_name: str, config: AgentConfig) -> None:
         super().__init__(agent_name, config)
+        cfg = config.custom
         self._db = MemoryDB()
+        self._capturer = DecisionCapturer(self._db, cfg)
+        self._brief_builder = ContextBriefBuilder(self._db, cfg)
+        self._pref_learner = PreferenceLearner(self._db, cfg)
+        self._retriever = ContextRetriever(self._db, cfg)
 
     def handle(self, task: Task) -> TaskResult:
         action = task.payload.get("action")
         p = task.payload
 
         dispatch = {
-            "store":        lambda: self._store(p),
-            "retrieve":     lambda: self._retrieve(p),
-            "summarize":    lambda: self._summarize(p),
-            "forget":       lambda: self._forget(p),
-            "list_recent":  lambda: self._list_recent(p),
+            # original 5
+            "store":              lambda: self._store(p),
+            "retrieve":           lambda: self._retrieve(p),
+            "summarize":          lambda: self._summarize(p),
+            "forget":             lambda: self._forget(p),
+            "list_recent":        lambda: self._list_recent(p),
+            # new 4
+            "capture_decision":   lambda: self._capture_decision(p),
+            "build_context_brief": lambda: self._build_context_brief(p),
+            "learn_preferences":  lambda: self._learn_preferences(p),
+            "retrieve_context":   lambda: self._retrieve_context(p),
         }
 
         handler = dispatch.get(action)
@@ -67,6 +87,10 @@ class MemoryAgent(BaseAgent):
             return True
         except Exception:
             return False
+
+    # ------------------------------------------------------------------
+    # Original 5 actions
+    # ------------------------------------------------------------------
 
     def _store(self, p: dict[str, Any]) -> dict[str, Any]:
         context_key = p.get("context_key", "general")
@@ -127,7 +151,19 @@ class MemoryAgent(BaseAgent):
         context_key = p.get("context_key", "")
         pattern = p.get("pattern", "")
         expire_only = p.get("expire_only", False)
+        topic = p.get("topic", "")
+        product = p.get("product", "")
 
+        # New: GDPR-safe targeted deletion from decision_log
+        if topic:
+            deleted = self._db.delete_decisions_by_topic(topic=topic)
+            return {"deleted": deleted, "mode": "topic", "topic": topic}
+
+        if product:
+            deleted = self._db.delete_decisions_by_product(product=product)
+            return {"deleted": deleted, "mode": "product", "product": product}
+
+        # Original: agent_memories maintenance
         if expire_only:
             deleted = self._db.delete_expired()
             return {"deleted": deleted, "mode": "expired"}
@@ -144,6 +180,46 @@ class MemoryAgent(BaseAgent):
         limit = int(p.get("limit", 10))
         memories = self._db.list_recent(context_key=context_key, limit=limit)
         return {"context_key": context_key, "memories": memories, "count": len(memories)}
+
+    # ------------------------------------------------------------------
+    # New 4 actions
+    # ------------------------------------------------------------------
+
+    def _capture_decision(self, p: dict[str, Any]) -> dict[str, Any]:
+        agent_name = p.get("agent", "")
+        completed_action = p.get("completed_action", "")
+        intent = p.get("intent", "")
+        outcome = p.get("outcome", "")
+        product = p.get("product", "")
+
+        if not agent_name or not completed_action:
+            return {"error": "agent and completed_action are required"}
+
+        return self._capturer.capture(
+            agent=agent_name,
+            action=completed_action,
+            intent=intent,
+            outcome=outcome,
+            product=product,
+        )
+
+    def _build_context_brief(self, p: dict[str, Any]) -> dict[str, Any]:
+        days = int(p.get("days", 7))
+        return self._brief_builder.build(days=days)
+
+    def _learn_preferences(self, p: dict[str, Any]) -> dict[str, Any]:
+        days = int(p.get("days", 30))
+        return self._pref_learner.learn(days=days)
+
+    def _retrieve_context(self, p: dict[str, Any]) -> dict[str, Any]:
+        query = p.get("query", "")
+        product = p.get("product", "")
+        limit = int(p.get("limit", 5))
+
+        if not query:
+            return {"error": "query required", "results": [], "count": 0}
+
+        return self._retriever.retrieve(query=query, product=product, limit=limit)
 
 
 if __name__ == "__main__":

@@ -1,4 +1,4 @@
-"""Memory DB — agent_memories table with pgvector semantic search."""
+"""Memory DB — agent_memories (pgvector), decision_log, and preferences tables."""
 
 from __future__ import annotations
 
@@ -116,3 +116,146 @@ class MemoryDB:
                     "DELETE FROM agent_memories WHERE id = ANY(%s::uuid[])",
                     (ids,),
                 )
+
+    # ------------------------------------------------------------------
+    # decision_log (migration 025)
+    # ------------------------------------------------------------------
+
+    def save_decision(
+        self,
+        agent: str,
+        action: str,
+        intent: str,
+        outcome: str,
+        product: str = "",
+        embedding: list[float] | None = None,
+    ) -> str:
+        with get_db() as conn:
+            with conn.cursor(cursor_factory=psycopg2.extras.RealDictCursor) as cur:
+                if embedding:
+                    cur.execute(
+                        """
+                        INSERT INTO decision_log (agent, action, intent, outcome, product, embedding)
+                        VALUES (%s, %s, %s, %s, %s, %s::vector) RETURNING id
+                        """,
+                        (agent, action, intent, outcome, product, str(embedding)),
+                    )
+                else:
+                    cur.execute(
+                        """
+                        INSERT INTO decision_log (agent, action, intent, outcome, product)
+                        VALUES (%s, %s, %s, %s, %s) RETURNING id
+                        """,
+                        (agent, action, intent, outcome, product),
+                    )
+                return str(cur.fetchone()["id"])
+
+    def list_recent_decisions(
+        self, days: int = 7, product: str = "", limit: int = 20
+    ) -> list[dict[str, Any]]:
+        with get_db() as conn:
+            with conn.cursor(cursor_factory=psycopg2.extras.RealDictCursor) as cur:
+                if product:
+                    cur.execute(
+                        """
+                        SELECT id, agent, action, intent, outcome, product, timestamp
+                        FROM decision_log
+                        WHERE timestamp >= NOW() - INTERVAL '%s days'
+                          AND product = %s
+                        ORDER BY timestamp DESC LIMIT %s
+                        """,
+                        (days, product, limit),
+                    )
+                else:
+                    cur.execute(
+                        """
+                        SELECT id, agent, action, intent, outcome, product, timestamp
+                        FROM decision_log
+                        WHERE timestamp >= NOW() - INTERVAL '%s days'
+                        ORDER BY timestamp DESC LIMIT %s
+                        """,
+                        (days, limit),
+                    )
+                return [dict(r) for r in cur.fetchall()]
+
+    def search_decisions(
+        self, embedding: list[float], product: str = "", limit: int = 5
+    ) -> list[dict[str, Any]]:
+        """Cosine similarity search over decision embeddings."""
+        with get_db() as conn:
+            with conn.cursor(cursor_factory=psycopg2.extras.RealDictCursor) as cur:
+                if product:
+                    cur.execute(
+                        """
+                        SELECT id, agent, action, intent, outcome, product, timestamp,
+                               1 - (embedding <=> %s::vector) AS similarity
+                        FROM decision_log
+                        WHERE embedding IS NOT NULL AND product = %s
+                        ORDER BY embedding <=> %s::vector LIMIT %s
+                        """,
+                        (str(embedding), product, str(embedding), limit),
+                    )
+                else:
+                    cur.execute(
+                        """
+                        SELECT id, agent, action, intent, outcome, product, timestamp,
+                               1 - (embedding <=> %s::vector) AS similarity
+                        FROM decision_log
+                        WHERE embedding IS NOT NULL
+                        ORDER BY embedding <=> %s::vector LIMIT %s
+                        """,
+                        (str(embedding), str(embedding), limit),
+                    )
+                return [dict(r) for r in cur.fetchall()]
+
+    def delete_decisions_by_topic(self, topic: str) -> int:
+        """GDPR-safe deletion: remove decisions where intent or outcome mentions topic."""
+        with get_db() as conn:
+            with conn.cursor() as cur:
+                cur.execute(
+                    "DELETE FROM decision_log WHERE intent ILIKE %s OR outcome ILIKE %s",
+                    (f"%{topic}%", f"%{topic}%"),
+                )
+                return cur.rowcount
+
+    def delete_decisions_by_product(self, product: str) -> int:
+        """Remove all decisions for a specific product."""
+        with get_db() as conn:
+            with conn.cursor() as cur:
+                cur.execute("DELETE FROM decision_log WHERE product = %s", (product,))
+                return cur.rowcount
+
+    # ------------------------------------------------------------------
+    # preferences (migration 025)
+    # ------------------------------------------------------------------
+
+    def upsert_preference(
+        self,
+        key: str,
+        value: str,
+        confidence: float = 0.5,
+        source_evidence: str = "",
+    ) -> None:
+        with get_db() as conn:
+            with conn.cursor() as cur:
+                cur.execute(
+                    """
+                    INSERT INTO preferences (key, value, confidence, source_evidence)
+                    VALUES (%s, %s, %s, %s)
+                    ON CONFLICT (key) DO UPDATE SET
+                        value           = EXCLUDED.value,
+                        confidence      = EXCLUDED.confidence,
+                        source_evidence = EXCLUDED.source_evidence,
+                        learned_at      = NOW()
+                    """,
+                    (key, value, confidence, source_evidence),
+                )
+
+    def list_preferences(self, min_confidence: float = 0.0) -> list[dict[str, Any]]:
+        with get_db() as conn:
+            with conn.cursor(cursor_factory=psycopg2.extras.RealDictCursor) as cur:
+                cur.execute(
+                    "SELECT * FROM preferences WHERE confidence >= %s ORDER BY confidence DESC",
+                    (min_confidence,),
+                )
+                return [dict(r) for r in cur.fetchall()]

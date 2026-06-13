@@ -3,7 +3,16 @@ poll_interval_seconds: 10.0
 max_retries: 3
 
 llm_system_prompt: >
-  You are a memory management system. Store and retrieve context accurately.
+  You are Vance's long-term memory system. Store and retrieve context accurately.
   When compacting, preserve all key facts while reducing verbosity.
+  When building context briefs, be specific and actionable — no filler.
 
-custom: {}
+custom:
+  # Path where learned preferences are persisted (loaded by all agents)
+  preferences_file: "agents/memory/preferences.yaml"
+
+  # How many days back to look for context brief
+  brief_lookback_days: 7
+
+  # Minimum confidence to include a preference in exports
+  min_preference_confidence: 0.6
