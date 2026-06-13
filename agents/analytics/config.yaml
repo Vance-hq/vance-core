@@ -1,14 +1,142 @@
 enabled: true
-poll_interval_seconds: 5.0
+poll_interval_seconds: 10.0
 max_retries: 3
+
 llm_system_prompt: >
-  You are a growth analyst for a SaaS company.
-  Summarise the provided metrics in 3-5 bullet points.
-  Flag anomalies and actionable opportunities.
-  Be concise — each bullet under 20 words. Use → to denote a recommended action.
+  You are a product and growth analyst. Interpret usage data, funnels, and cohorts
+  to surface actionable insights. Be precise and concise — every sentence should
+  lead to a decision or action.
+
 custom:
-  report_cache_ttl_s: 3600
-  funnel_events:
-    - signup
-    - trial_started
-    - payment_completed
+  umami:
+    base_url: ""          # e.g. https://umami.yourdomain.com
+    api_key: ""
+
+  supabase:
+    url: ""               # e.g. https://xxxx.supabase.co
+    service_key: ""
+
+  at_risk_days: 7
+  dormant_days: 14
+
+  engagement_weights:
+    login_frequency: 0.30
+    feature_breadth: 0.25
+    session_duration: 0.25
+    recency: 0.20
+
+  products:
+    starpio:
+      umami_website_id: ""
+      funnel_metric_map:
+        visit: site_visits
+        signup: signups
+        activated: activated_users
+        paid: paid_users
+        retained: retained_users
+      features:
+        - name: ai_responses
+          event_name: ai_response_sent
+        - name: review_monitoring
+          event_name: review_received
+        - name: gbp_integration
+          event_name: gbp_sync_completed
+        - name: sms_alerts
+          event_name: sms_alert_sent
+      supabase_queries:
+        - name: reviews_processed
+          sql: "SELECT COUNT(*)::int as count FROM reviews WHERE product='starpio' AND DATE(created_at)='{date}'"
+        - name: ai_responses_sent
+          sql: "SELECT COUNT(*)::int as count FROM ai_responses WHERE product='starpio' AND DATE(created_at)='{date}'"
+        - name: active_locations
+          sql: "SELECT COUNT(DISTINCT location_id)::int as count FROM location_activity WHERE product='starpio' AND DATE(last_active)='{date}'"
+
+    oneserv:
+      umami_website_id: ""
+      funnel_metric_map:
+        visit: site_visits
+        signup: signups
+        activated: first_job_created
+        paid: paid_users
+        retained: retained_users
+      features:
+        - name: job_creation
+          event_name: job_created
+        - name: dispatch
+          event_name: job_dispatched
+        - name: invoicing
+          event_name: invoice_sent
+        - name: crew_management
+          event_name: crew_assigned
+      supabase_queries:
+        - name: jobs_created
+          sql: "SELECT COUNT(*)::int as count FROM jobs WHERE product='oneserv' AND DATE(created_at)='{date}'"
+        - name: jobs_completed
+          sql: "SELECT COUNT(*)::int as count FROM jobs WHERE product='oneserv' AND status='completed' AND DATE(updated_at)='{date}'"
+        - name: active_techs
+          sql: "SELECT COUNT(DISTINCT tech_id)::int as count FROM job_assignments WHERE product='oneserv' AND DATE(assigned_at)='{date}'"
+
+    localoutrank:
+      umami_website_id: ""
+      funnel_metric_map:
+        visit: site_visits
+        signup: signups
+        activated: first_audit_run
+        paid: paid_users
+        retained: retained_users
+      features:
+        - name: seo_audit
+          event_name: audit_completed
+        - name: citation_tracking
+          event_name: citation_checked
+        - name: gbp_optimizer
+          event_name: gbp_optimization_applied
+        - name: rank_tracker
+          event_name: rank_checked
+      supabase_queries:
+        - name: audits_run
+          sql: "SELECT COUNT(*)::int as count FROM seo_audits WHERE product='localoutrank' AND DATE(created_at)='{date}'"
+        - name: reports_viewed
+          sql: "SELECT COUNT(*)::int as count FROM report_views WHERE product='localoutrank' AND DATE(viewed_at)='{date}'"
+        - name: gbp_optimizations_applied
+          sql: "SELECT COUNT(*)::int as count FROM gbp_tasks WHERE product='localoutrank' AND status='applied' AND DATE(updated_at)='{date}'"
+
+    localrankgrader:
+      umami_website_id: ""
+      funnel_metric_map:
+        visit: site_visits
+        signup: audits_submitted
+        activated: reports_delivered
+        paid: paid_users
+        retained: retained_users
+      features:
+        - name: audit_submission
+          event_name: audit_submitted
+        - name: report_delivery
+          event_name: report_delivered
+      supabase_queries:
+        - name: audits_submitted
+          sql: "SELECT COUNT(*)::int as count FROM lrg_audits WHERE DATE(created_at)='{date}'"
+        - name: reports_delivered
+          sql: "SELECT COUNT(*)::int as count FROM lrg_audits WHERE status='delivered' AND DATE(updated_at)='{date}'"
+
+    trusted_plumbing:
+      umami_website_id: ""
+      funnel_metric_map:
+        visit: site_visits
+        signup: contact_form_submissions
+        activated: call_clicks
+        paid: paid_users
+        retained: retained_users
+      features:
+        - name: contact_form
+          event_name: contact_form_submitted
+        - name: call_click
+          event_name: phone_number_clicked
+      supabase_queries:
+        - name: site_visits
+          sql: "SELECT COUNT(*)::int as count FROM page_views WHERE product='trusted_plumbing' AND DATE(viewed_at)='{date}'"
+        - name: contact_form_submissions
+          sql: "SELECT COUNT(*)::int as count FROM contact_submissions WHERE product='trusted_plumbing' AND DATE(created_at)='{date}'"
+        - name: call_clicks
+          sql: "SELECT COUNT(*)::int as count FROM call_events WHERE product='trusted_plumbing' AND DATE(created_at)='{date}'"

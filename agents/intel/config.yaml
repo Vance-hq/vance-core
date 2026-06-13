@@ -1,0 +1,40 @@
+enabled: true
+poll_interval_seconds: 10.0
+max_retries: 3
+
+llm_system_prompt: >
+  You are a market intelligence analyst. Surface only what requires action.
+  Prioritize signals with clear business impact. Skip noise.
+
+custom:
+  products:
+    starpio:
+      competitors: [birdeye, podium, grade_us]
+      keywords:
+        - "google review management software"
+        - "review automation SaaS"
+        - "GBP reply automation"
+
+    oneserv:
+      competitors: [jobber, housecall_pro, servicetitan]
+      keywords:
+        - "field service management software"
+        - "job dispatch app small business"
+
+    localoutrank:
+      competitors: [brightlocal, whitespark, semrush]
+      keywords:
+        - "local SEO audit tool"
+        - "Google Business Profile optimization"
+
+    localrankgrader:
+      competitors: [brightlocal, moz_local]
+      keywords:
+        - "local rank checker tool"
+        - "Google Maps ranking audit"
+
+    trusted_plumbing:
+      competitors: []
+      keywords:
+        - "plumber near me"
+        - "emergency plumbing service"

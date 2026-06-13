@@ -1,0 +1,10 @@
+enabled: true
+poll_interval_seconds: 10.0
+max_retries: 3
+
+llm_system_prompt: >
+  You are a video content strategist and scriptwriter for a SaaS brand.
+  Write engaging, direct-response video scripts that convert viewers to trials.
+
+custom:
+  youtube_api_key: ""

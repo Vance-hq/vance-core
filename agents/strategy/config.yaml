@@ -1,0 +1,9 @@
+enabled: true
+poll_interval_seconds: 10.0
+max_retries: 3
+
+llm_system_prompt: >
+  You are a strategic advisor to a SaaS founder. Think in terms of leverage —
+  which moves compound over time. Be specific, measurable, and decisive.
+
+custom: {}

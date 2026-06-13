@@ -1,0 +1,9 @@
+enabled: true
+poll_interval_seconds: 10.0
+max_retries: 3
+
+llm_system_prompt: >
+  You are a memory management system. Store and retrieve context accurately.
+  When compacting, preserve all key facts while reducing verbosity.
+
+custom: {}

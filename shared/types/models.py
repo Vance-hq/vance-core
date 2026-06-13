@@ -32,6 +32,19 @@ class AgentCapability(str, Enum):
     FORGE = "forge"
     LOCAL_RANK_GRADER = "local_rank_grader"
     INTEGRATIONS = "integrations"
+    REPORTING = "reporting"
+    INTEL = "intel"
+    STRATEGY = "strategy"
+    MEMORY = "memory"
+    VIDEO = "video"
+    CONTENT = "content"
+    SUPPORT = "support"
+    QA = "qa"
+    SEO = "seo"
+    VIRAL = "viral"
+    RESEARCH = "research"
+    ONBOARDING = "onboarding"
+    LAUNCH = "launch"
 
 
 @dataclass
