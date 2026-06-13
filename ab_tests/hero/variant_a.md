@@ -2,7 +2,7 @@
 product: starpio
 section: hero
 variant: A
-piece_id: 0804dd38-784d-4e18-bef3-ac3509b7acab
+piece_id: da237fdf-cb2c-42b1-97d8-045767858485
 performance_signal: written
 ---
 
