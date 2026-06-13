@@ -2,8 +2,8 @@
 product: starpio
 section: hero
 variant: A
-piece_id: da237fdf-cb2c-42b1-97d8-045767858485
+piece_id: 56814a15-0b82-4c4b-94fa-c3cfbf87be3b
 performance_signal: written
 ---
 
-Hero text A
+Hero A

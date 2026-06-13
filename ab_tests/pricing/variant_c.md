@@ -2,7 +2,7 @@
 product: starpio
 section: pricing
 variant: C
-piece_id: 6a10277b-d1fc-4db3-a12e-c5098dbf60d7
+piece_id: e761c956-64ac-418c-a85e-b508c792c27a
 performance_signal: written
 ---
 
