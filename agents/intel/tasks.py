@@ -1,4 +1,4 @@
-"""Celery tasks for the intel agent — daily schedules."""
+"""Celery tasks for the intel agent."""
 
 from __future__ import annotations
 
@@ -61,3 +61,98 @@ def weekly_competitor_social() -> None:
                 agent.handle(task)
             except Exception as exc:
                 logger.error("weekly_competitor_social_failed", action=action, product=product, error=str(exc))
+
+
+@app.task(name="agents.intel.tasks.competitor_activity_watch", ignore_result=True)
+def competitor_activity_watch() -> None:
+    """Run every 6 hours — visual diff + blog/LinkedIn/jobs/G2 monitoring per product."""
+    import uuid
+
+    from agents._base import AgentConfig
+    from agents.intel.main import IntelAgent
+    from shared.types import AgentCapability, Task
+
+    config = AgentConfig.load("intel")
+    agent = IntelAgent("intel", config)
+
+    for product in config.custom.get("products", {}):
+        task = Task(
+            id=str(uuid.uuid4()),
+            agent=AgentCapability.INTEL,
+            payload={"action": "competitor_activity_watch", "product": product},
+        )
+        try:
+            agent.handle(task)
+        except Exception as exc:
+            logger.error("competitor_activity_watch_failed", product=product, error=str(exc))
+
+
+@app.task(name="agents.intel.tasks.daily_press_monitoring", ignore_result=True)
+def daily_press_monitoring() -> None:
+    """Run daily — SerpAPI news search for product/founder/competitor mentions."""
+    import uuid
+
+    from agents._base import AgentConfig
+    from agents.intel.main import IntelAgent
+    from shared.types import AgentCapability, Task
+
+    config = AgentConfig.load("intel")
+    agent = IntelAgent("intel", config)
+
+    for product in config.custom.get("products", {}):
+        task = Task(
+            id=str(uuid.uuid4()),
+            agent=AgentCapability.INTEL,
+            payload={"action": "press_monitoring", "product": product},
+        )
+        try:
+            agent.handle(task)
+        except Exception as exc:
+            logger.error("daily_press_monitoring_failed", product=product, error=str(exc))
+
+
+@app.task(name="agents.intel.tasks.daily_community_listen", ignore_result=True)
+def daily_community_listen() -> None:
+    """Run daily — Reddit + Facebook community monitoring per product."""
+    import uuid
+
+    from agents._base import AgentConfig
+    from agents.intel.main import IntelAgent
+    from shared.types import AgentCapability, Task
+
+    config = AgentConfig.load("intel")
+    agent = IntelAgent("intel", config)
+
+    for product in config.custom.get("products", {}):
+        task = Task(
+            id=str(uuid.uuid4()),
+            agent=AgentCapability.INTEL,
+            payload={"action": "community_listen", "product": product},
+        )
+        try:
+            agent.handle(task)
+        except Exception as exc:
+            logger.error("daily_community_listen_failed", product=product, error=str(exc))
+
+
+@app.task(name="agents.intel.tasks.monthly_opportunity_scan", ignore_result=True)
+def monthly_opportunity_scan() -> None:
+    """Run monthly — ProductHunt, API integrations, affiliate partners scored by LLM."""
+    import uuid
+
+    from agents._base import AgentConfig
+    from agents.intel.main import IntelAgent
+    from shared.types import AgentCapability, Task
+
+    config = AgentConfig.load("intel")
+    agent = IntelAgent("intel", config)
+
+    task = Task(
+        id=str(uuid.uuid4()),
+        agent=AgentCapability.INTEL,
+        payload={"action": "opportunity_scan"},
+    )
+    try:
+        agent.handle(task)
+    except Exception as exc:
+        logger.error("monthly_opportunity_scan_failed", error=str(exc))

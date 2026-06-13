@@ -7,34 +7,121 @@ llm_system_prompt: >
   Prioritize signals with clear business impact. Skip noise.
 
 custom:
+  # SerpAPI key for news/competitor search
+  serp_api_key: ""
+
+  # Apify for Facebook group scraping
+  apify_api_token: ""
+  apify_facebook_run_id: ""
+
+  # Reddit subreddits to monitor
+  subreddits:
+    - msp
+    - smallbusiness
+    - Plumbing
+    - SaaS
+    - Entrepreneur
+
+  # Keywords for opportunity scanning
+  opportunity_keywords:
+    - "review management"
+    - "field service management"
+    - "local SEO"
+    - "plumbing software"
+
   products:
     starpio:
       competitors: [birdeye, podium, grade_us]
+      direct_competitors: [birdeye, podium]   # checked every 6h; others daily
       keywords:
         - "google review management software"
         - "review automation SaaS"
         - "GBP reply automation"
+      press_keywords:
+        - "Starpio"
+        - "Dutch review management"
+        - "birdeye competitor"
+        - "podium alternative"
+      competitor_urls:
+        birdeye:
+          pricing: "https://birdeye.com/pricing"
+          blog: "birdeye.com/blog"
+          jobs: ""
+        podium:
+          pricing: "https://podium.com/pricing"
+          blog: "podium.com/resources"
+          jobs: ""
+        grade_us:
+          pricing: "https://grade.us/pricing"
+          blog: "grade.us/blog"
+          jobs: ""
 
     oneserv:
       competitors: [jobber, housecall_pro, servicetitan]
+      direct_competitors: [jobber, housecall_pro]
       keywords:
         - "field service management software"
         - "job dispatch app small business"
+      press_keywords:
+        - "OneServ"
+        - "field service management news"
+        - "jobber alternative"
+      competitor_urls:
+        jobber:
+          pricing: "https://getjobber.com/pricing"
+          blog: "getjobber.com/blog"
+          jobs: ""
+        housecall_pro:
+          pricing: "https://www.housecallpro.com/pricing"
+          blog: "www.housecallpro.com/blog"
+          jobs: ""
+        servicetitan:
+          pricing: ""
+          blog: "www.servicetitan.com/blog"
+          jobs: ""
 
     localoutrank:
       competitors: [brightlocal, whitespark, semrush]
+      direct_competitors: [brightlocal, whitespark]
       keywords:
         - "local SEO audit tool"
         - "Google Business Profile optimization"
+      press_keywords:
+        - "LocalOutrank"
+        - "local SEO software news"
+        - "brightlocal alternative"
+      competitor_urls:
+        brightlocal:
+          pricing: "https://www.brightlocal.com/pricing"
+          blog: "www.brightlocal.com/blog"
+          jobs: ""
+        whitespark:
+          pricing: "https://whitespark.ca/local-rank-tracker"
+          blog: "whitespark.ca/blog"
+          jobs: ""
 
     localrankgrader:
       competitors: [brightlocal, moz_local]
+      direct_competitors: [brightlocal]
       keywords:
         - "local rank checker tool"
         - "Google Maps ranking audit"
+      press_keywords:
+        - "LocalRankGrader"
+        - "local rank checker news"
+      competitor_urls:
+        brightlocal:
+          pricing: "https://www.brightlocal.com/pricing"
+          blog: "www.brightlocal.com/blog"
+          jobs: ""
 
     trusted_plumbing:
       competitors: []
+      direct_competitors: []
       keywords:
         - "plumber near me"
         - "emergency plumbing service"
+      press_keywords:
+        - "Trusted Plumbing"
+        - "plumbing service news Dallas"
+      competitor_urls: {}
